@@ -735,8 +735,7 @@ territories.forEach(t=>{
     icon.setAttribute("y", cy - iconSize/2);
   });
 
-  g.addEventListener("click",()=>{
-    if(didPan) return;
+  function openModal(){
     document.getElementById("modal-title").textContent=t.name||"Territory "+t.id;
     document.getElementById("modal-subtitle").textContent=t.subtitle||"";
     document.getElementById("modal-icon").src=t.icon;
@@ -747,7 +746,20 @@ territories.forEach(t=>{
     const statusEl=document.getElementById("modal-status");
     statusEl.innerHTML=`<span class="modal-status-badge badge-${t.status||'neutral'}">${t.statusLabel||"Unknown"}</span>`;
     overlay.classList.add("open");
+  }
+
+  g.addEventListener("click",()=>{
+    if(didPan) return;
+    openModal();
   });
+
+  // Mobile tap: fire on touchend if no pan occurred
+  g.addEventListener("touchend",e=>{
+    if(!didPan){
+      e.preventDefault();
+      openModal();
+    }
+  },{passive:false});
 });
 
 /* TOUCH PAN & PINCH-TO-ZOOM */
@@ -816,11 +828,22 @@ container.addEventListener("touchend",e=>{
   if(e.touches.length===0){
     dragging=false;
     lastTouchDist=0;
+    // Reset didPan after a short delay so tap-click can fire
+    setTimeout(()=>{ didPan=false; }, 50);
   }
 },{passive:true});
 
 /* TOGGLE BORDERS ONLY */
 let bordersOnly=false;
+// Prevent button touches from being swallowed by the map container's touchstart
+const toggleBtn=document.getElementById("toggle-nodes-btn");
+toggleBtn.addEventListener("touchstart",e=>e.stopPropagation(),{passive:true});
+toggleBtn.addEventListener("touchend",e=>{
+  e.stopPropagation();
+  e.preventDefault();
+  toggleBtn.click();
+},{passive:false});
+
 document.getElementById("toggle-nodes-btn").addEventListener("click",()=>{
   bordersOnly=!bordersOnly;
   const btn=document.getElementById("toggle-nodes-btn");
