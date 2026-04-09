@@ -53,6 +53,35 @@ body{
   margin-left:4px;
 }
 
+/* BORDERS BUTTON — top right */
+#toggle-nodes-btn{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:999;
+  background:#121212;
+  border:1px solid white;
+  color:#e0e0e0;
+  font-family:"Times New Roman",serif;
+  font-size:12px;
+  padding:4px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  letter-spacing:0.5px;
+  box-shadow:0 0 6px rgba(255,255,255,0.15);
+}
+#toggle-nodes-btn:hover{
+  background:rgba(255,255,255,0.1);
+  border-color:white;
+  box-shadow:0 0 10px rgba(255,255,255,0.35);
+}
+#toggle-nodes-btn.borders-only{
+  color:#aad4ff;
+  border-color:rgba(100,180,255,0.6);
+  box-shadow:0 0 8px rgba(100,180,255,0.4);
+}
+
 /* MAP */
 #map-container{
   width:100vw;
@@ -107,6 +136,11 @@ body{
 /* ✅ FIXED HOVER */
 .territory-group:hover .territory-poly{
   fill:rgba(255,182,193,0.4) !important;
+}
+
+/* Borders-only mode: suppress hover fill */
+#territory-svg.borders-only .territory-group:hover .territory-poly{
+  fill:none !important;
 }
 
 /* NUMBER BOX */
@@ -375,6 +409,8 @@ body{
     Warfare Rules <span>!</span>
   </a>
 </div>
+
+<button id="toggle-nodes-btn">◈ Borders Only</button>
 
 <div id="map-container">
   <div id="map-wrapper">
@@ -704,6 +740,33 @@ territories.forEach(t=>{
     const statusEl=document.getElementById("modal-status");
     statusEl.innerHTML=`<span class="modal-status-badge badge-${t.status||'neutral'}">${t.statusLabel||"Unknown"}</span>`;
     overlay.classList.add("open");
+  });
+});
+
+/* TOGGLE BORDERS ONLY */
+let bordersOnly=false;
+document.getElementById("toggle-nodes-btn").addEventListener("click",()=>{
+  bordersOnly=!bordersOnly;
+  const btn=document.getElementById("toggle-nodes-btn");
+  btn.textContent=bordersOnly?"◈ Show All":"◈ Borders Only";
+  btn.classList.toggle("borders-only",bordersOnly);
+  svg.classList.toggle("borders-only",bordersOnly);
+
+  // Toggle fills, labels, icons
+  document.querySelectorAll(".territory-poly").forEach(p=>{
+    if(bordersOnly){
+      p.dataset.prevFill=p.style.fill;
+      p.style.fill="none";
+      p.style.stroke="silver";
+    } else {
+      p.style.fill=p.dataset.prevFill||"";
+    }
+  });
+  document.querySelectorAll(".node-label").forEach(el=>{
+    el.style.display=bordersOnly?"none":"";
+  });
+  document.querySelectorAll(".territory-icon").forEach(el=>{
+    el.style.display=bordersOnly?"none":"";
   });
 });
 
