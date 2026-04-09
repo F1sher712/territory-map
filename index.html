@@ -579,7 +579,7 @@ territories.forEach(t=>{
   const poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
   poly.setAttribute("points",t.points.map(p=>p.join(",")).join(" "));
   poly.setAttribute("class","territory-poly");
-  poly.style.fill = hexToRGBA(t.color, 0.15);
+  poly.style.fill = hexToRGBA(t.color, 0.19);
 
   const cx=t.points.reduce((s,p)=>s+p[0],0)/t.points.length;
   const cy=t.points.reduce((s,p)=>s+p[1],0)/t.points.length;
