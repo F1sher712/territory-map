@@ -534,6 +534,7 @@ function clamp(){
 }
 
 container.addEventListener("wheel",e=>{
+  e.stopPropagation();
   e.preventDefault();
 
   const rect=wrapper.getBoundingClientRect();
@@ -750,12 +751,12 @@ territories.forEach(t=>{
 });
 
 /* TOUCH PAN & PINCH-TO-ZOOM */
-let lastTouchDist=0, touchStartX=0, touchStartY=0, touchDidPan=false;
+let lastTouchDist=0, touchStartX=0, touchStartY=0;
 
 container.addEventListener("touchstart",e=>{
+  e.preventDefault();
   if(e.touches.length===1){
     dragging=true;
-    touchDidPan=false;
     didPan=false;
     lastX=e.touches[0].clientX;
     lastY=e.touches[0].clientY;
@@ -763,12 +764,13 @@ container.addEventListener("touchstart",e=>{
     touchStartY=lastY;
   } else if(e.touches.length===2){
     dragging=false;
+    didPan=true; // treat pinch as a pan so click doesn't fire after
     lastTouchDist=Math.hypot(
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
     );
   }
-},{passive:true});
+},{passive:false});
 
 container.addEventListener("touchmove",e=>{
   e.preventDefault();
@@ -782,7 +784,6 @@ container.addEventListener("touchmove",e=>{
     const tdx=e.touches[0].clientX-touchStartX;
     const tdy=e.touches[0].clientY-touchStartY;
     if(Math.abs(tdx)>PAN_THRESHOLD||Math.abs(tdy)>PAN_THRESHOLD){
-      touchDidPan=true;
       didPan=true;
     }
     clamp();
@@ -792,6 +793,7 @@ container.addEventListener("touchmove",e=>{
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
     );
+    if(!lastTouchDist) { lastTouchDist=dist; return; }
     const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
     const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
     const rect=wrapper.getBoundingClientRect();
@@ -813,6 +815,7 @@ container.addEventListener("touchmove",e=>{
 container.addEventListener("touchend",e=>{
   if(e.touches.length===0){
     dragging=false;
+    lastTouchDist=0;
   }
 },{passive:true});
 
