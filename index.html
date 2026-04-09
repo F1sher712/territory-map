@@ -18,32 +18,34 @@ body{
 /* TOP BAR */
 #top-bar{
   position:fixed;
-  top:20px;
+  top:12px;
   left:50%;
   transform:translateX(-50%);
   background:#121212;
   border:1px solid white;
-  padding:14px 30px;
+  padding:10px 20px;
   border-radius:16px;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:4px;
   z-index:999;
+  max-width:calc(100vw - 130px);
+  white-space:nowrap;
 }
 
 #top-title{
   display:flex;
   align-items:center;
-  gap:10px;
-  font-size:20px;
+  gap:8px;
+  font-size:clamp(13px, 3.5vw, 20px);
   font-weight:700;
 }
 
-#top-title img{height:32px;}
+#top-title img{height:clamp(20px, 4vw, 32px);}
 
 #rules-link{
-  font-size:14px;
+  font-size:clamp(10px, 2.5vw, 14px);
   color:rgb(71, 166, 221);
   text-decoration:none;
 }
@@ -56,20 +58,22 @@ body{
 /* BORDERS BUTTON — top right */
 #toggle-nodes-btn{
   position:fixed;
-  top:20px;
-  right:20px;
+  top:12px;
+  right:12px;
   z-index:999;
   background:#121212;
   border:1px solid white;
   color:#e0e0e0;
   font-family:"Times New Roman",serif;
-  font-size:12px;
-  padding:4px 14px;
+  font-size:clamp(10px, 2.5vw, 12px);
+  padding:6px 12px;
   border-radius:8px;
   cursor:pointer;
   transition:background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
   letter-spacing:0.5px;
   box-shadow:0 0 6px rgba(255,255,255,0.15);
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
 }
 #toggle-nodes-btn:hover{
   background:rgba(255,255,255,0.1);
@@ -90,6 +94,7 @@ body{
   cursor:grab;
   user-select:none;
   -webkit-user-select:none;
+  touch-action:none;
 }
 #map-container.grabbing{cursor:grabbing;}
 
@@ -214,10 +219,11 @@ body{
 .modal{
   position:relative;
   width:560px;
-  max-width:93vw;
+  max-width:96vw;
+  max-height:90vh;
+  overflow-y:auto;
   background:#121212;
   border-radius:4px;
-  overflow:hidden;
   box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
   animation:slideUp 0.25s ease;
   font-family:"Times New Roman",serif;
@@ -250,7 +256,7 @@ body{
 .modal-inner{
   position:relative;
   z-index:1;
-  padding:22px 26px 26px;
+  padding:clamp(14px,4vw,22px) clamp(14px,4vw,26px) clamp(16px,4vw,26px);
 }
 
 /* HEADER */
@@ -263,8 +269,8 @@ body{
 
 .modal-icon-wrap{
   flex-shrink:0;
-  width:84px;
-  height:84px;
+  width:clamp(56px,15vw,84px);
+  height:clamp(56px,15vw,84px);
   border-radius:6px;
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.1);
@@ -286,7 +292,7 @@ body{
 }
 
 .modal-header-text h2{
-  font-size:17px;
+  font-size:clamp(13px,4vw,17px);
   font-weight:700;
   letter-spacing:0.6px;
   color:#f0f0f0;
