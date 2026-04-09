@@ -124,16 +124,22 @@ body{
   pointer-events:none;
 }
 
-/* ICON */
+/* ICON — hidden by default, shown on hover */
 .territory-icon{
   pointer-events:none;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+
+.territory-group:hover .territory-icon{
+  opacity:1;
 }
 
 /* MODAL */
 .modal-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,0.55);
   display:none;
   justify-content:center;
   align-items:center;
@@ -141,26 +147,111 @@ body{
 .modal-overlay.open{display:flex;}
 
 .modal{
-  background:black;
-  padding:20px 25px;
-  border-radius:8px;
-  border:1px solid white;
+  background:#1a1a1e;
+  padding:28px 32px;
+  border-radius:12px;
+  border:1px solid #3a3a4a;
   position:relative;
-  width:auto;
-  max-width:90vw;
+  width:420px;
+  max-width:92vw;
+  box-shadow:0 8px 40px rgba(0,0,0,0.7);
 }
 
-.modal h2{
-  margin-bottom:8px;
+.modal-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+  padding-bottom:14px;
+  border-bottom:1px solid #2e2e3a;
 }
+
+.modal-faction-icon{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  border-radius:6px;
+  background:#111;
+  padding:4px;
+}
+
+.modal-header-text h2{
+  font-size:18px;
+  font-weight:700;
+  margin:0 0 2px 0;
+  letter-spacing:0.5px;
+}
+
+.modal-header-text .modal-subtitle{
+  font-size:12px;
+  color:#888;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.modal-body{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.modal-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 10px;
+  background:#111116;
+  border-radius:6px;
+  border:1px solid #252530;
+}
+
+.modal-row .label{
+  color:#888;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+}
+
+.modal-row .value{
+  font-weight:600;
+  color:#e0e0e0;
+}
+
+.modal-desc{
+  margin-top:6px;
+  font-size:13px;
+  color:#aaa;
+  line-height:1.7;
+  font-style:italic;
+  border-left:2px solid #3a3a4a;
+  padding-left:10px;
+}
+
+.modal-status-badge{
+  display:inline-block;
+  padding:2px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.5px;
+}
+
+.badge-contested{ background:#5a2020; color:#ff8080; }
+.badge-controlled{ background:#1a4a2a; color:#80ff9a; }
+.badge-neutral{ background:#2a2a40; color:#9090ff; }
 
 .modal-close{
   position:absolute;
-  top:6px;
-  right:10px;
-  font-size:18px;
+  top:10px;
+  right:14px;
+  font-size:20px;
   cursor:pointer;
+  color:#555;
+  transition:color 0.2s;
 }
+.modal-close:hover{ color:#ccc; }
 </style>
 </head>
 
@@ -188,9 +279,32 @@ body{
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-close" id="modal-close">&times;</div>
-    <h2 id="modal-title"></h2>
-    <div id="modal-size"></div>
-    <div id="modal-extra"></div>
+    <div class="modal-header">
+      <img class="modal-faction-icon" id="modal-icon" src="" alt="faction icon">
+      <div class="modal-header-text">
+        <h2 id="modal-title"></h2>
+        <div class="modal-subtitle" id="modal-subtitle"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <span class="label">Controller</span>
+        <span class="value" id="modal-controller"></span>
+      </div>
+      <div class="modal-row">
+        <span class="label">Status</span>
+        <span class="value" id="modal-status"></span>
+      </div>
+      <div class="modal-row">
+        <span class="label">Size</span>
+        <span class="value" id="modal-size"></span>
+      </div>
+      <div class="modal-row">
+        <span class="label">Strategic Value</span>
+        <span class="value" id="modal-value"></span>
+      </div>
+      <div class="modal-desc" id="modal-desc"></div>
+    </div>
   </div>
 </div>
 
@@ -215,15 +329,24 @@ function init(){
   const mW=mapImg.naturalWidth;
   const mH=mapImg.naturalHeight;
 
+  if(!mW || !mH) return;
+
+  wrapper.style.width=mW+"px";
+  wrapper.style.height=mH+"px";
+
   minScale=Math.min(cW/mW,cH/mH);
-  scale=minScale;
+  scale=minScale*1.5;
 
   originX=(cW - mW*scale)/2;
   originY=(cH - mH*scale)/2;
 
   apply();
 }
-mapImg.onload=init;
+if(mapImg.complete && mapImg.naturalWidth>0){
+  init();
+} else {
+  mapImg.onload=init;
+}
 window.addEventListener("resize",init);
 
 function apply(){
@@ -231,14 +354,25 @@ function apply(){
 }
 
 function clamp(){
-  const rect=wrapper.getBoundingClientRect();
-  const cRect=container.getBoundingClientRect();
+  const cW=container.clientWidth;
+  const cH=container.clientHeight;
+  const mW=mapImg.naturalWidth;
+  const mH=mapImg.naturalHeight;
 
-  const minX=cRect.width-rect.width;
-  const minY=cRect.height-rect.height;
+  const scaledW=mW*scale;
+  const scaledH=mH*scale;
 
-  originX=Math.min(0,Math.max(minX,originX));
-  originY=Math.min(0,Math.max(minY,originY));
+  if(scaledW<=cW){
+    originX=(cW-scaledW)/2;
+  } else {
+    originX=Math.min(0,Math.max(cW-scaledW,originX));
+  }
+
+  if(scaledH<=cH){
+    originY=(cH-scaledH)/2;
+  } else {
+    originY=Math.min(0,Math.max(cH-scaledH,originY));
+  }
 }
 
 container.addEventListener("wheel",e=>{
@@ -297,10 +431,50 @@ window.addEventListener("mousemove",e=>{
 
 /* TERRITORIES */
 const territories=[
-  {id:1,color:"#f7ebeb",icon:"mono.png",points:[[25,32],[36,30],[42,36],[40,46],[34,50],[24,46]]},
-  {id:2,color:"#1da842",icon:"Freedom.png",points:[[50,30],[60,28],[65,35],[62,42],[55,45],[48,38]]},
-  {id:3,color:"#bd983c",icon:"Loner Logo without background.png",points:[[30,60],[40,58],[45,65],[42,72],[35,75],[28,68]]},
-  {id:4,color:"#750808",icon:"Duty.png",points:[[60,60],[70,58],[75,65],[72,72],[65,75],[58,68]]}
+  {
+    id:1,color:"#f7ebeb",icon:"mono.png",
+    points:[[25,32],[36,30],[42,36],[40,46],[34,50],[24,46]],
+    name:"The Monolith Outpost",
+    subtitle:"Northern Sector — Node 01",
+    controller:"Monolith",
+    status:"contested",statusLabel:"Contested",
+    size:"Medium",
+    value:"⭐⭐⭐⭐",
+    desc:"A heavily fortified research installation deep within the northern exclusion zone. Monolith forces have held this node for weeks, using it to conduct anomalous field experiments. Recent Duty incursions have destabilized the perimeter — control is no longer guaranteed."
+  },
+  {
+    id:2,color:"#1da842",icon:"Freedom.png",
+    points:[[50,30],[60,28],[65,35],[62,42],[55,45],[48,38]],
+    name:"Freedom's Ridge",
+    subtitle:"Central Sector — Node 02",
+    controller:"Freedom",
+    status:"controlled",statusLabel:"Controlled",
+    size:"Large",
+    value:"⭐⭐⭐",
+    desc:"An elevated vantage point overlooking the central plains. Freedom stalkers use this node as a rally point and supply depot. The open terrain makes it easy to defend but difficult to hold under sustained fire."
+  },
+  {
+    id:3,color:"#bd983c",icon:"Loner Logo without background.png",
+    points:[[30,60],[40,58],[45,65],[42,72],[35,75],[28,68]],
+    name:"The Drifter's Cache",
+    subtitle:"Southern Sector — Node 03",
+    controller:"Loners",
+    status:"neutral",statusLabel:"Neutral",
+    size:"Small",
+    value:"⭐⭐",
+    desc:"An abandoned warehouse repurposed by independent stalkers as a neutral trading post. No faction officially claims it, but its location near two major routes makes it a frequent flashpoint for skirmishes."
+  },
+  {
+    id:4,color:"#750808",icon:"Duty.png",
+    points:[[60,60],[70,58],[75,65],[72,72],[65,75],[58,68]],
+    name:"Duty Stronghold",
+    subtitle:"Eastern Sector — Node 04",
+    controller:"Duty",
+    status:"controlled",statusLabel:"Controlled",
+    size:"Large",
+    value:"⭐⭐⭐⭐⭐",
+    desc:"The most fortified position on the map. Duty's iron grip on this node gives them control over the eastern supply corridor. Reinforced bunkers and constant patrols make any assault a costly endeavor."
+  }
 ];
 
 const svg=document.getElementById("territory-svg");
@@ -326,31 +500,22 @@ territories.forEach(t=>{
   icon.setAttribute("y",cy - iconSize/2);
   icon.setAttribute("width",iconSize);
   icon.setAttribute("height",iconSize);
-
-  const box=document.createElementNS("http://www.w3.org/2000/svg","rect");
-  box.setAttribute("x",cx-1.3);
-  box.setAttribute("y",cy + iconSize/2 - 0.15);
-  box.setAttribute("width",2.6);
-  box.setAttribute("height",1.1);
-  box.setAttribute("rx",0.3);
-  box.setAttribute("class","number-box");
-
-  const label=document.createElementNS("http://www.w3.org/2000/svg","text");
-  label.setAttribute("x",cx);
-  label.setAttribute("y",cy + iconSize/2 + 0.35);
-  label.setAttribute("class","territory-label");
-  label.textContent=t.id;
+  icon.setAttribute("class","territory-icon");
 
   g.appendChild(poly);
   g.appendChild(icon);
-  g.appendChild(box);
-  g.appendChild(label);
   svg.appendChild(g);
 
   g.addEventListener("click",()=>{
-    document.getElementById("modal-title").textContent="Territory "+t.id;
-    document.getElementById("modal-size").textContent="Size: Unknown";
-    document.getElementById("modal-extra").textContent="Status: Unknown";
+    document.getElementById("modal-title").textContent=t.name||"Territory "+t.id;
+    document.getElementById("modal-subtitle").textContent=t.subtitle||"";
+    document.getElementById("modal-icon").src=t.icon;
+    document.getElementById("modal-controller").textContent=t.controller||"Unknown";
+    document.getElementById("modal-size").textContent=t.size||"Unknown";
+    document.getElementById("modal-value").textContent=t.value||"—";
+    document.getElementById("modal-desc").textContent=t.desc||"";
+    const statusEl=document.getElementById("modal-status");
+    statusEl.innerHTML=`<span class="modal-status-badge badge-${t.status||'neutral'}">${t.statusLabel||"Unknown"}</span>`;
     overlay.classList.add("open");
   });
 });
