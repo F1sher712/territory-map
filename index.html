@@ -749,6 +749,73 @@ territories.forEach(t=>{
   });
 });
 
+/* TOUCH PAN & PINCH-TO-ZOOM */
+let lastTouchDist=0, touchStartX=0, touchStartY=0, touchDidPan=false;
+
+container.addEventListener("touchstart",e=>{
+  if(e.touches.length===1){
+    dragging=true;
+    touchDidPan=false;
+    didPan=false;
+    lastX=e.touches[0].clientX;
+    lastY=e.touches[0].clientY;
+    touchStartX=lastX;
+    touchStartY=lastY;
+  } else if(e.touches.length===2){
+    dragging=false;
+    lastTouchDist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+  }
+},{passive:true});
+
+container.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  if(e.touches.length===1 && dragging){
+    const dx=e.touches[0].clientX-lastX;
+    const dy=e.touches[0].clientY-lastY;
+    originX+=dx;
+    originY+=dy;
+    lastX=e.touches[0].clientX;
+    lastY=e.touches[0].clientY;
+    const tdx=e.touches[0].clientX-touchStartX;
+    const tdy=e.touches[0].clientY-touchStartY;
+    if(Math.abs(tdx)>PAN_THRESHOLD||Math.abs(tdy)>PAN_THRESHOLD){
+      touchDidPan=true;
+      didPan=true;
+    }
+    clamp();
+    apply();
+  } else if(e.touches.length===2){
+    const dist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
+    const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    const rect=wrapper.getBoundingClientRect();
+    const mX=midX-rect.left;
+    const mY=midY-rect.top;
+    const zoom=dist/lastTouchDist;
+    let newScale=scale*zoom;
+    if(newScale<minScale) newScale=minScale;
+    const ratio=newScale/scale;
+    originX=midX-mX*ratio;
+    originY=midY-mY*ratio;
+    scale=newScale;
+    lastTouchDist=dist;
+    clamp();
+    apply();
+  }
+},{passive:false});
+
+container.addEventListener("touchend",e=>{
+  if(e.touches.length===0){
+    dragging=false;
+  }
+},{passive:true});
+
 /* TOGGLE BORDERS ONLY */
 let bordersOnly=false;
 document.getElementById("toggle-nodes-btn").addEventListener("click",()=>{
