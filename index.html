@@ -599,6 +599,10 @@ window.addEventListener("mousemove",e=>{
   apply();
 });
 
+/* TAP DETECTION — track per-touch whether it was a pan */
+let tapStartX=0, tapStartY=0, wasTap=false;
+const TAP_THRESHOLD=8;
+
 /* TERRITORIES */
 const territories=[
   {
@@ -753,30 +757,31 @@ territories.forEach(t=>{
     openModal();
   });
 
-  // Mobile tap: fire on touchend if no pan occurred
+  // Mobile tap: fire on touchend only if finger barely moved
   g.addEventListener("touchend",e=>{
-    if(!didPan){
+    if(wasTap){
       e.preventDefault();
+      e.stopPropagation();
       openModal();
     }
   },{passive:false});
 });
 
 /* TOUCH PAN & PINCH-TO-ZOOM */
-let lastTouchDist=0, touchStartX=0, touchStartY=0;
+let lastTouchDist=0;
 
 container.addEventListener("touchstart",e=>{
   e.preventDefault();
   if(e.touches.length===1){
     dragging=true;
-    didPan=false;
+    wasTap=true;
     lastX=e.touches[0].clientX;
     lastY=e.touches[0].clientY;
-    touchStartX=lastX;
-    touchStartY=lastY;
+    tapStartX=lastX;
+    tapStartY=lastY;
   } else if(e.touches.length===2){
     dragging=false;
-    didPan=true; // treat pinch as a pan so click doesn't fire after
+    wasTap=false;
     lastTouchDist=Math.hypot(
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
@@ -793,10 +798,10 @@ container.addEventListener("touchmove",e=>{
     originY+=dy;
     lastX=e.touches[0].clientX;
     lastY=e.touches[0].clientY;
-    const tdx=e.touches[0].clientX-touchStartX;
-    const tdy=e.touches[0].clientY-touchStartY;
-    if(Math.abs(tdx)>PAN_THRESHOLD||Math.abs(tdy)>PAN_THRESHOLD){
-      didPan=true;
+    const tdx=e.touches[0].clientX-tapStartX;
+    const tdy=e.touches[0].clientY-tapStartY;
+    if(Math.abs(tdx)>TAP_THRESHOLD||Math.abs(tdy)>TAP_THRESHOLD){
+      wasTap=false;
     }
     clamp();
     apply();
@@ -805,7 +810,7 @@ container.addEventListener("touchmove",e=>{
       e.touches[0].clientX-e.touches[1].clientX,
       e.touches[0].clientY-e.touches[1].clientY
     );
-    if(!lastTouchDist) { lastTouchDist=dist; return; }
+    if(!lastTouchDist){ lastTouchDist=dist; return; }
     const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
     const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
     const rect=wrapper.getBoundingClientRect();
@@ -828,30 +833,30 @@ container.addEventListener("touchend",e=>{
   if(e.touches.length===0){
     dragging=false;
     lastTouchDist=0;
-    // Reset didPan after a short delay so tap-click can fire
-    setTimeout(()=>{ didPan=false; }, 50);
+    // wasTap stays true here — territory touchend fires first and reads it, then we reset
+    setTimeout(()=>{ wasTap=false; },100);
   }
 },{passive:true});
 
 /* TOGGLE BORDERS ONLY */
 let bordersOnly=false;
-// Prevent button touches from being swallowed by the map container's touchstart
 const toggleBtn=document.getElementById("toggle-nodes-btn");
-toggleBtn.addEventListener("touchstart",e=>e.stopPropagation(),{passive:true});
-toggleBtn.addEventListener("touchend",e=>{
+
+// On mobile, touchstart on the button fires before the container's touchstart
+// because the button is NOT inside the container — so stopPropagation works fine.
+// We handle the full toggle on touchstart to be as responsive as possible.
+toggleBtn.addEventListener("touchstart",e=>{
   e.stopPropagation();
   e.preventDefault();
-  toggleBtn.click();
+  doToggle();
 },{passive:false});
 
-document.getElementById("toggle-nodes-btn").addEventListener("click",()=>{
+function doToggle(){
   bordersOnly=!bordersOnly;
-  const btn=document.getElementById("toggle-nodes-btn");
-  btn.textContent=bordersOnly?"◈ Show All":"◈ Borders Only";
-  btn.classList.toggle("borders-only",bordersOnly);
+  toggleBtn.textContent=bordersOnly?"◈ Show All":"◈ Borders Only";
+  toggleBtn.classList.toggle("borders-only",bordersOnly);
   svg.classList.toggle("borders-only",bordersOnly);
 
-  // Toggle fills, labels, icons
   document.querySelectorAll(".territory-poly").forEach(p=>{
     if(bordersOnly){
       p.dataset.prevFill=p.style.fill;
@@ -867,7 +872,10 @@ document.getElementById("toggle-nodes-btn").addEventListener("click",()=>{
   document.querySelectorAll(".territory-icon").forEach(el=>{
     el.style.display=bordersOnly?"none":"";
   });
-});
+}
+
+// Desktop click
+toggleBtn.addEventListener("click", doToggle);
 
 document.getElementById("modal-close").onclick=()=>overlay.classList.remove("open");
 overlay.onclick=e=>{
