@@ -1183,7 +1183,7 @@ territories.forEach(t => {
   poly.setAttribute("class","territory-poly");
   poly.style.fill = hexToRGBA(t.color, 0.19);
 
-  const iconSize = 1.8;
+  const iconSize = 2;
   const label = document.createElementNS("http://www.w3.org/2000/svg","text");
   label.setAttribute("class","node-label");
   label.textContent = String(t.id).padStart(2,"0");
