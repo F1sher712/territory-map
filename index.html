@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Node Map</title>
+<title>Territory Map</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -15,12 +15,68 @@ body{
   color:white;
 }
 
-/* ── MENU WIDGET (top-right) ── */
-#menu-widget{
+/* ── TOP-RIGHT HUD: wraps stats widget + menu widget side by side ── */
+#top-right-hud{
   position:fixed;
   top:14px;
   right:14px;
   z-index:9999;
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+}
+
+/* ── STATS WIDGET ── */
+#stats-widget{
+  background:#121212;
+  border:1.5px solid rgba(220,220,220,0.5);
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(192,192,192,0.2);
+  padding:5px 9px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:64px;
+  align-self:flex-start;
+  margin-top:2px;
+}
+
+.stats-row{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.stats-icon{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(192,192,192,0.3);
+  flex-shrink:0;
+  display:block;
+}
+
+.stats-count{
+  font-family:"Times New Roman",serif;
+  font-size:13px;
+  font-weight:700;
+  color:#e8e8e8;
+  letter-spacing:0.5px;
+  white-space:nowrap;
+}
+
+.stats-count.unc{
+  color:#888;
+}
+
+.stats-divider{
+  height:1px;
+  background:rgba(192,192,192,0.12);
+}
+
+/* ── MENU WIDGET (top-right) ── */
+#menu-widget{
   display:flex;
   flex-direction:column;
   align-items:flex-end;
@@ -70,10 +126,10 @@ body{
   white-space:nowrap;
 }
 
-/* Circle logo — 57px (~10% smaller than 63px) */
+/* Circle logo — 68px (slightly larger than stats widget) */
 #menu-logo{
-  width:57px;
-  height:57px;
+  width:68px;
+  height:68px;
   border-radius:50%;
   object-fit:cover;
   display:block;
@@ -168,11 +224,10 @@ body{
   touch-action:manipulation;
 }
 .menu-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
-.menu-item .menu-icon{ font-size:20px; opacity:0.7; }
+.menu-item .menu-icon{ font-size:15px; opacity:0.7; }
 .menu-separator{ height:1px; background:rgba(255,255,255,0.07); }
 
 #toggle-nodes-btn{
-  /* inherit .menu-item layout — do NOT use all:unset here */
   box-sizing:border-box;
   appearance:none;
   -webkit-appearance:none;
@@ -282,12 +337,7 @@ body{
 .territory-group:hover .territory-icon,
 .territory-group:active .territory-icon{opacity:1;}
 
-/* ── MODAL ──
-   Key fix: position:fixed + inset:0 on the overlay.
-   NO backdrop-filter on the overlay itself — that creates a new stacking
-   context which breaks position:fixed on iOS Safari/Chrome.
-   The blur goes on the modal box instead.
-── */
+/* ── MODAL ── */
 #modal-overlay{
   position:fixed;
   top:0;
@@ -482,13 +532,167 @@ body{
 }
 .modal-close:hover{ color:#bbb; }
 
-/* ── MOBILE ── */
-@media (max-width:600px){
-  /* Menu widget */
-  #menu-widget{ top:10px; right:10px; }
-  #menu-logo{ width:48px; height:48px; }
+/* ── LEADERBOARD MODAL ── */
+#leaderboard-overlay{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+#leaderboard-overlay.open{ display:flex; }
 
-  /* On touch: always show label + chevron when open */
+#leaderboard-box{
+  position:relative;
+  width:420px;
+  max-width:92vw;
+  max-height:85vh;
+  overflow-y:auto;
+  background:#121212;
+  border-radius:4px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
+  animation:slideUp 0.25s ease;
+  font-family:"Times New Roman",serif;
+}
+
+#leaderboard-box::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 3px,
+    rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px
+  );
+  pointer-events:none;
+  z-index:0;
+}
+
+#leaderboard-inner{
+  position:relative;
+  z-index:1;
+  padding:22px 24px 26px;
+}
+
+#leaderboard-title{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:1.2px;
+  color:#f0f0f0;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+
+#leaderboard-sub{
+  font-size:10px;
+  color:#555;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+
+.lb-divider{
+  height:1px;
+  background:rgba(192,192,192,0.1);
+  margin-bottom:14px;
+}
+
+.lb-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:4px;
+  margin-bottom:6px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.lb-rank{
+  font-size:12px;
+  font-weight:700;
+  color:#555;
+  letter-spacing:0.5px;
+  min-width:22px;
+  text-align:center;
+}
+
+.lb-icons{
+  display:flex;
+  align-items:center;
+  gap:3px;
+  flex-shrink:0;
+}
+
+.lb-icon{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(192,192,192,0.25);
+  display:block;
+}
+
+.lb-names{
+  flex:1;
+  min-width:0;
+}
+
+.lb-name{
+  font-size:12px;
+  color:#ccc;
+  letter-spacing:0.3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.lb-count{
+  font-size:13px;
+  font-weight:700;
+  color:#e8e8e8;
+  letter-spacing:0.5px;
+  flex-shrink:0;
+}
+
+.lb-row.rank-1{
+  border-color:rgba(255,215,0,0.25);
+  background:rgba(255,215,0,0.05);
+}
+.lb-row.rank-1 .lb-rank{ color:#ffd700; }
+.lb-row.rank-1 .lb-count{ color:#ffd700; }
+
+#leaderboard-close{
+  position:absolute;
+  top:12px; right:14px;
+  font-size:20px;
+  cursor:pointer;
+  color:#444;
+  transition:color 0.2s;
+  z-index:2;
+  line-height:1;
+  padding:4px 8px;
+}
+#leaderboard-close:hover{ color:#bbb; }
+
+@media (max-width:600px){
+  #leaderboard-box{
+    width:100%; max-width:100%; max-height:80vh;
+    border-radius:16px 16px 0 0;
+  }
+  #leaderboard-inner{ padding:20px 16px 28px; }
+  #leaderboard-overlay{ align-items:flex-end; }
+}
+@media (max-width:600px){
+  #top-right-hud{ top:10px; right:10px; gap:6px; }
+  #menu-logo{ width:54px; height:54px; }
+  #stats-widget{ padding:4px 8px; min-width:56px; }
+  .stats-icon{ width:19px; height:19px; }
+  .stats-count{ font-size:12px; }
+
   #menu-card.open #menu-label{
     font-size:14px; max-width:120px; opacity:1; padding-left:10px;
   }
@@ -496,11 +700,9 @@ body{
     max-width:20px; opacity:1; margin-left:6px; margin-right:10px;
   }
 
-  /* Bigger tap targets for menu items */
   .menu-item{ padding:14px 18px; font-size:15px; }
   .menu-item .menu-icon{ font-size:17px; }
 
-  /* Modal: full-width, anchored to bottom for thumb reach */
   #modal-overlay{ align-items:flex-end; }
   .modal{
     width:100%;
@@ -517,7 +719,6 @@ body{
   .modal-stat .stat-label{ font-size:9px; }
   .modal-stat .stat-value{ font-size:13px; }
   .modal-desc{ font-size:13px; line-height:1.65; }
-  /* Bigger close button for touch */
   .modal-close{ font-size:26px; top:10px; right:12px; padding:6px 10px; }
 }
 </style>
@@ -525,28 +726,47 @@ body{
 
 <body>
 
-<!-- Menu widget: pill + dropdown inside one seamless card -->
-<div id="menu-widget">
-  <div id="menu-card">
-    <div id="menu-pill">
-      <img id="menu-logo" src="button.png" alt="Menu">
-      <span id="menu-label">Menu</span>
-      <span id="menu-chevron">▼</span>
-    </div>
-    <div id="menu-divider-line"></div>
-    <div id="menu-dropdown">
-      <a class="menu-item" href="https://docs.google.com/document/d/1uo7Kn0eOoMWLEY8FDHopDWbpXySb-J01I7ewMGmW6XQ/edit?tab=t.0" target="_blank">
-        <span class="menu-icon">📋</span> Warfare Rules
-      </a>
-      <div class="menu-separator"></div>
-      <button class="menu-item" id="toggle-nodes-btn">
-        <span class="menu-icon">🗺️</span> Borders Only
-      </button>
+<!-- Top-right HUD: stats widget + menu widget side by side -->
+<div id="top-right-hud">
+
+  <!-- Stats widget: leading faction (top) + uncontrolled count (bottom) -->
+  <div id="stats-widget">
+    <div class="stats-row" id="stats-top-row"></div>
+    <div class="stats-divider"></div>
+    <div class="stats-row">
+      <img class="stats-icon" src="unc.png" alt="uncontrolled">
+      <span class="stats-count unc" id="stats-unc-count">#0</span>
     </div>
   </div>
+
+  <!-- Menu widget: pill + dropdown inside one seamless card -->
+  <div id="menu-widget">
+    <div id="menu-card">
+      <div id="menu-pill">
+        <img id="menu-logo" src="button.png" alt="Menu">
+        <span id="menu-label">Menu</span>
+        <span id="menu-chevron">▼</span>
+      </div>
+      <div id="menu-divider-line"></div>
+      <div id="menu-dropdown">
+        <a class="menu-item" href="https://docs.google.com/document/d/1uo7Kn0eOoMWLEY8FDHopDWbpXySb-J01I7ewMGmW6XQ/edit?tab=t.0" target="_blank">
+          <span class="menu-icon">📋</span> Warfare Rules
+        </a>
+        <div class="menu-separator"></div>
+        <button class="menu-item" id="leaderboard-btn">
+          <span class="menu-icon">🏆</span> Leaderboard
+        </button>
+        <div class="menu-separator"></div>
+        <button class="menu-item" id="toggle-nodes-btn">
+          <span class="menu-icon">🗺️</span> Borders Only
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Map container: only the map lives here -->
+<!-- Map container -->
 <div id="map-container">
   <div id="map-wrapper">
     <img src="map.png" class="map" id="map-img">
@@ -554,7 +774,7 @@ body{
   </div>
 </div>
 
-<!-- Modal: lives directly in body, completely outside map container -->
+<!-- Modal -->
 <div id="modal-overlay">
   <div class="modal" id="modal-box">
     <div class="modal-accent-bar" id="modal-accent-bar"></div>
@@ -595,6 +815,19 @@ body{
   </div>
 </div>
 
+<!-- Leaderboard modal -->
+<div id="leaderboard-overlay">
+  <div id="leaderboard-box">
+    <div id="leaderboard-inner">
+      <div id="leaderboard-close">×</div>
+      <div id="leaderboard-title">Leaderboard</div>
+      <div id="leaderboard-sub">Territory Control Rankings</div>
+      <div class="lb-divider"></div>
+      <div id="leaderboard-rows"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 let scale, minScale;
 let originX, originY;
@@ -623,13 +856,11 @@ function init(){
   wrapper.style.width  = mW + "px";
   wrapper.style.height = mH + "px";
 
-  const scaleW = cW / mW;   // scale to fill width
-  const scaleH = cH / mH;   // scale to fill height
-  const fitBoth = Math.min(scaleW, scaleH); // fit whole map on screen
+  const scaleW = cW / mW;
+  const scaleH = cH / mH;
+  const fitBoth = Math.min(scaleW, scaleH);
 
   if(isMobile()){
-    // On mobile: floor = fill width so map always spans the screen horizontally.
-    // User can never zoom out past this.
     minScale = scaleW;
   } else {
     minScale = fitBoth;
@@ -796,14 +1027,14 @@ const territories=[
     desc:"Description of this territory."
   },
   {
-    id:5,color:"#00e5ff",icon:"mono.png",
+    id:5,color:"#00a5b8",icon:"mono.png",
     path:"m 0,16.266167 v 2.544608 c 0,0 1.0307274,0 1.3206195,-0.257682 0,0 2.0614549,-0.773045 3.607546,0.09663 L 3.6397562,16.072906 c 0,0 0,-0.547574 -1.7715627,0.257682 z",
     name:"Territory Name",subtitle:"Sector — Node 05",controller:"Monolith",
     status:"neutral",statusLabel:"Neutral",size:"Medium",value:"⭐⭐⭐",
     desc:"Description of this territory."
   },
   {
-    id:6,color:"#bd983c",icon:"Loner logo without background.png",
+    id:6,color:"#bd983c",icon:"Loner Logo without background.png",
     path:"m 1.3528297,19.42277 1.1917786,-0.09663 0.06442,1.739353 -1.1595684,0.03221 z",
     name:"Territory Name",subtitle:"Sector — Node 06",controller:"Loners",
     status:"neutral",statusLabel:"Neutral",size:"Medium",value:"⭐⭐⭐",
@@ -817,7 +1048,7 @@ const territories=[
     desc:"Description of this territory."
   },
   {
-    id:8,color:"#bd983c",icon:"Loner logo without background.png",
+    id:8,color:"#a1710b",icon:"Loner logo without background.png",
     path:"m 6.6506134,20.99954 c 0,0 0.8199387,-0.318865 1.3665644,0.04555 0,0 0.5466259,0.819941 1.6854296,0.911045 0,0 -1.0021473,2.095399 -0.2733129,3.325307 0,0 0.318865,-2.004295 -9.4292945,-0.865491 l 0.09110429,-3.18865 c 0,0 1.09325151,0.04555 1.27546011,-0.364418 l 0.068328,0.239149 1.1274157,-0.05694 0.05694,-0.239149 c 0,0 1.8220856,0.728835 4.0313649,0.193597 z",
     name:"Territory Name",subtitle:"Sector — Node 08",controller:"Loners",
     status:"neutral",statusLabel:"Neutral",size:"Medium",value:"⭐⭐⭐",
@@ -825,6 +1056,121 @@ const territories=[
   }
 ];
 
+/* ── FACTION DATA: shared computation ── */
+function computeFactionData(){
+  const UNC = "Uncontrolled";
+  const counts = {};
+  let uncCount = 0;
+
+  territories.forEach(t => {
+    if(t.controller === UNC){
+      uncCount++;
+    } else {
+      if(!counts[t.controller]) counts[t.controller] = { count:0, icon:t.icon, name:t.controller };
+      counts[t.controller].count++;
+    }
+  });
+
+  // Build sorted tiers: group factions with equal counts together
+  const sorted = Object.values(counts).sort((a,b) => b.count - a.count);
+  const tiers = [];
+  sorted.forEach(faction => {
+    const last = tiers[tiers.length - 1];
+    if(last && last[0].count === faction.count){
+      last.push(faction);
+    } else {
+      tiers.push([faction]);
+    }
+  });
+
+  return { tiers, uncCount };
+}
+
+/* ── STATS WIDGET: render top row with tie support ── */
+(function renderStats(){
+  const { tiers, uncCount } = computeFactionData();
+
+  const topRow = document.getElementById("stats-top-row");
+  document.getElementById("stats-unc-count").textContent = "#" + uncCount;
+
+  if(!tiers.length){
+    topRow.style.display = "none";
+    return;
+  }
+
+  const topTier = tiers[0];
+
+  // Clear existing content in top row and rebuild
+  topRow.innerHTML = "";
+
+  // Icons group (side by side for ties)
+  const iconsWrap = document.createElement("div");
+  iconsWrap.style.cssText = "display:flex;align-items:center;gap:3px;flex-shrink:0;";
+  topTier.forEach(f => {
+    const img = document.createElement("img");
+    img.className = "stats-icon";
+    img.src = f.icon;
+    img.alt = f.name;
+    iconsWrap.appendChild(img);
+  });
+
+  const countSpan = document.createElement("span");
+  countSpan.className = "stats-count";
+  countSpan.textContent = "#" + topTier[0].count;
+
+  topRow.appendChild(iconsWrap);
+  topRow.appendChild(countSpan);
+})();
+
+/* ── LEADERBOARD: build rows ── */
+function buildLeaderboard(){
+  const { tiers } = computeFactionData();
+  const container = document.getElementById("leaderboard-rows");
+  container.innerHTML = "";
+
+  if(!tiers.length){
+    container.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:16px;">No controlled territories yet.</div>';
+    return;
+  }
+
+  tiers.forEach((tier, idx) => {
+    const rank = idx + 1;
+    const row = document.createElement("div");
+    row.className = "lb-row" + (rank === 1 ? " rank-1" : "");
+
+    const rankEl = document.createElement("div");
+    rankEl.className = "lb-rank";
+    rankEl.textContent = "#" + rank;
+
+    const iconsEl = document.createElement("div");
+    iconsEl.className = "lb-icons";
+    tier.forEach(f => {
+      const img = document.createElement("img");
+      img.className = "lb-icon";
+      img.src = f.icon;
+      img.alt = f.name;
+      iconsEl.appendChild(img);
+    });
+
+    const namesEl = document.createElement("div");
+    namesEl.className = "lb-names";
+    namesEl.innerHTML = tier.map(f =>
+      `<div class="lb-name">${f.name}</div>`
+    ).join("");
+
+    const countEl = document.createElement("div");
+    countEl.className = "lb-count";
+    countEl.textContent = tier[0].count + (tier[0].count === 1 ? " node" : " nodes");
+
+    row.appendChild(rankEl);
+    row.appendChild(iconsEl);
+    row.appendChild(namesEl);
+    row.appendChild(countEl);
+    container.appendChild(row);
+  });
+}
+
+/* ── BUILD TERRITORY SVG ── */
 const svg = document.getElementById("territory-svg");
 
 territories.forEach(t => {
@@ -837,7 +1183,7 @@ territories.forEach(t => {
   poly.setAttribute("class","territory-poly");
   poly.style.fill = hexToRGBA(t.color, 0.19);
 
-  const iconSize = 1.8;
+  const iconSize = 1.6;
   const label = document.createElementNS("http://www.w3.org/2000/svg","text");
   label.setAttribute("class","node-label");
   label.textContent = String(t.id).padStart(2,"0");
@@ -890,8 +1236,8 @@ territories.forEach(t => {
 /* ── MENU PILL TOGGLE ── */
 const menuPill     = document.getElementById("menu-pill");
 const menuDropdown = document.getElementById("menu-dropdown");
+const menuCard     = document.getElementById("menu-card");
 
-const menuCard = document.getElementById("menu-card");
 function openMenu(){ menuDropdown.classList.add("open"); menuCard.classList.add("open"); }
 function closeMenu(){ menuDropdown.classList.remove("open"); menuCard.classList.remove("open"); }
 
@@ -906,7 +1252,7 @@ menuPill.addEventListener("touchstart", e => {
 },{passive:false});
 
 document.addEventListener("click", e => {
-  if(!document.getElementById("menu-widget").contains(e.target)) closeMenu();
+  if(!document.getElementById("top-right-hud").contains(e.target)) closeMenu();
 });
 
 /* ── TOGGLE BORDERS ONLY ── */
@@ -915,7 +1261,6 @@ const toggleBtn = document.getElementById("toggle-nodes-btn");
 
 function doToggle(){
   bordersOnly = !bordersOnly;
-  // update label inside the button
   toggleBtn.querySelector(".menu-icon").textContent = "🗺️";
   toggleBtn.childNodes[toggleBtn.childNodes.length-1].textContent = bordersOnly ? " Show All" : " Borders Only";
   svg.classList.toggle("borders-only", bordersOnly);
@@ -930,6 +1275,22 @@ function doToggle(){
 
 toggleBtn.addEventListener("click", e => { e.stopPropagation(); doToggle(); });
 toggleBtn.addEventListener("touchstart", e => { e.stopPropagation(); e.preventDefault(); doToggle(); },{passive:false});
+
+/* ── LEADERBOARD BUTTON ── */
+const lbOverlay = document.getElementById("leaderboard-overlay");
+const lbBtn     = document.getElementById("leaderboard-btn");
+
+function openLeaderboard(){
+  buildLeaderboard();
+  lbOverlay.classList.add("open");
+  closeMenu();
+}
+
+lbBtn.addEventListener("click", e => { e.stopPropagation(); openLeaderboard(); });
+lbBtn.addEventListener("touchstart", e => { e.stopPropagation(); e.preventDefault(); openLeaderboard(); },{passive:false});
+
+document.getElementById("leaderboard-close").onclick = () => lbOverlay.classList.remove("open");
+lbOverlay.addEventListener("click", e => { if(e.target === lbOverlay) lbOverlay.classList.remove("open"); });
 
 document.getElementById("modal-close").onclick = () => overlay.classList.remove("open");
 overlay.addEventListener("click", e => { if(e.target === overlay) overlay.classList.remove("open"); });
