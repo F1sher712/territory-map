@@ -57,7 +57,7 @@ body{
   box-shadow:0 0 20px rgba(192,192,192,0.3);
 }
 
-/* The pill:  circle + "Menu" text side by side */
+/* The pill: logo circle + "Menu" text side by side */
 #menu-pill{
   display:flex;
   align-items:center;
@@ -70,8 +70,8 @@ body{
   white-space:nowrap;
 }
 
-/* Circle  — 57px (~10% smaller than 63px) */
-#menu-{
+/* Circle logo — 57px (~10% smaller than 63px) */
+#menu-logo{
   width:57px;
   height:57px;
   border-radius:50%;
@@ -83,8 +83,8 @@ body{
   box-shadow:0 0 10px rgba(192,192,192,0.25);
   transition:box-shadow 0.2s;
 }
-#menu-card:hover #menu-,
-#menu-card.open #menu-{
+#menu-card:hover #menu-logo,
+#menu-card.open #menu-logo{
   border-color:transparent;
   box-shadow:none;
 }
@@ -204,7 +204,7 @@ body{
   transform-origin:0 0;
 }
 
-#bg-{
+#bg-logo{
   position:absolute;
   top:50%;
   left:50%;
@@ -486,7 +486,7 @@ body{
 @media (max-width:600px){
   /* Menu widget */
   #menu-widget{ top:10px; right:10px; }
-  #menu-{ width:48px; height:48px; }
+  #menu-logo{ width:48px; height:48px; }
 
   /* On touch: always show label + chevron when open */
   #menu-card.open #menu-label{
@@ -768,7 +768,7 @@ container.addEventListener("touchend", e => {
 /* TERRITORIES */
 const territories=[
   {
-    id:1,color:"#bd983c",icon:"Loner Logo without background.png",
+    id:1,color:"#0a0a0a",icon:"unc.png",
     path:"M 0.12884093,1.2884093 4.1873302,1.2561991 4.7026938,1.9970344 3.8330176,3.9618586 4.0584892,4.3161711 0.03221023,4.4772222 Z",
     name:"Territory Name",subtitle:"Sector — Node 01",controller:"Loners",
     status:"neutral",statusLabel:"Neutral",size:"Medium",value:"⭐⭐⭐",
