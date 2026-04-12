@@ -648,23 +648,27 @@ body{
   background:rgba(0,0,0,0.8);
   display:none;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
   z-index:999999;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  padding:5vh 0;
 }
 #edit-overlay.open{ display:flex; }
 
 #edit-box{
   position:relative;
   width:480px;max-width:92vw;
-  max-height:88vh;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  touch-action:pan-y;
+  flex-shrink:0;
   background:#121212;
   border-radius:8px;
   box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
   animation:slideUp 0.25s ease;
   font-family:"Times New Roman",serif;
+  touch-action:pan-y;
 }
 
 #edit-accent{
@@ -911,10 +915,12 @@ body{
     width:100%;max-width:100%;max-height:80vh;
     border-radius:16px 16px 0 0;
   }
-  #edit-overlay{ align-items:flex-end; }
+  #edit-overlay{
+    align-items:flex-end;
+    padding:0;
+  }
   #edit-box{
     width:100%;max-width:100%;
-    max-height:92vh;
     border-radius:16px 16px 0 0;
   }
   #edit-inner{ padding:20px 16px 32px; }
@@ -922,7 +928,7 @@ body{
   .edit-field input,
   .edit-field select,
   .edit-field textarea{ font-size:16px; padding:11px 12px; }
-  .edit-actions{ position:sticky; bottom:0; background:#121212; padding-top:12px; margin-top:8px; }
+  .edit-actions{ padding-top:12px; margin-top:8px; }
   #login-overlay{ align-items:flex-end; }
   #login-box{
     width:100%;max-width:100%;
@@ -1620,6 +1626,24 @@ document.getElementById("edit-overlay").addEventListener("click", e => {
     editingIdx = null;
   }
 });
+
+/* Stop edit overlay touch events from reaching the map underneath */
+const editOverlayEl = document.getElementById("edit-overlay");
+editOverlayEl.addEventListener("touchstart", e => { e.stopPropagation(); }, {passive:true});
+editOverlayEl.addEventListener("touchmove",  e => { e.stopPropagation(); }, {passive:true});
+editOverlayEl.addEventListener("touchend",   e => { e.stopPropagation(); }, {passive:true});
+
+/* Same for login overlay */
+const loginOverlayEl = document.getElementById("login-overlay");
+loginOverlayEl.addEventListener("touchstart", e => { e.stopPropagation(); }, {passive:true});
+loginOverlayEl.addEventListener("touchmove",  e => { e.stopPropagation(); }, {passive:true});
+loginOverlayEl.addEventListener("touchend",   e => { e.stopPropagation(); }, {passive:true});
+
+/* Same for view modal */
+const viewOverlayEl = document.getElementById("modal-overlay");
+viewOverlayEl.addEventListener("touchstart", e => { e.stopPropagation(); }, {passive:true});
+viewOverlayEl.addEventListener("touchmove",  e => { e.stopPropagation(); }, {passive:true});
+viewOverlayEl.addEventListener("touchend",   e => { e.stopPropagation(); }, {passive:true});
 
 /* Auto-fill status label when status changes */
 document.getElementById("edit-status").addEventListener("change", function(){
