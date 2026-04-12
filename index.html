@@ -15,6 +15,16 @@ body{
   color:white;
 }
 
+/* ── NO TEXT SELECTION ── */
+#top-right-hud,
+#modal-overlay,
+#leaderboard-overlay,
+#login-overlay,
+#edit-overlay{
+  user-select:none;
+  -webkit-user-select:none;
+}
+
 /* ── TOP-RIGHT HUD ── */
 #top-right-hud{
   position:fixed;
@@ -1112,6 +1122,7 @@ const ADMIN_PASSWORD = "eocnodemappass";
 
 /* ── SESSION STATE ── */
 let isAdmin = false;
+const ADMIN_SESSION_KEY = "territory_admin_session";
 
 /* ── STORAGE KEY PREFIX ── */
 const STORE_PREFIX = "territory_";
@@ -1574,11 +1585,21 @@ document.getElementById("edit-status").addEventListener("change", function(){
 });
 
 /* ── LOGIN ── */
-function setAdminState(loggedIn){
+function setAdminState(loggedIn, persist){
   isAdmin = loggedIn;
+  if(loggedIn && persist !== false){
+    sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+  } else if(!loggedIn){
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  }
   document.getElementById("admin-indicator").classList.toggle("visible", loggedIn);
   document.getElementById("login-btn").style.display  = loggedIn ? "none" : "flex";
   document.getElementById("logout-btn").style.display = loggedIn ? "flex" : "none";
+}
+
+/* Restore session on page load/refresh */
+if(sessionStorage.getItem(ADMIN_SESSION_KEY) === "1"){
+  setAdminState(true, false);
 }
 
 document.getElementById("login-btn").addEventListener("click", e => {
