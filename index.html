@@ -363,6 +363,96 @@ body{
 .territory-group:hover .territory-icon,
 .territory-group:active .territory-icon{opacity:1;}
 
+/* ── OWNERSHIP HISTORY ── */
+.history-chain{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.history-entry{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  position:relative;
+}
+
+.history-icon-wrap{
+  position:relative;
+  flex-shrink:0;
+}
+
+.history-icon{
+  width:32px;height:32px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,0.12);
+  display:block;
+}
+
+.history-delete-btn{
+  display:none;
+  position:absolute;
+  top:-4px;right:-4px;
+  width:14px;height:14px;
+  background:#1a1a1a;
+  border:1px solid rgba(255,80,80,0.5);
+  border-radius:50%;
+  color:#ff6060;
+  font-size:9px;
+  line-height:14px;
+  text-align:center;
+  cursor:pointer;
+  z-index:2;
+  padding:0;
+  font-family:sans-serif;
+  transition:background 0.15s;
+}
+.history-delete-btn:hover{ background:#ff3030; color:#fff; border-color:#ff3030; }
+body.admin-mode .history-delete-btn{ display:block; }
+
+.history-info{
+  flex:1;min-width:0;
+}
+
+.history-faction-name{
+  font-size:12px;color:#bbb;
+  letter-spacing:0.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.history-date{
+  font-size:10px;color:#555;
+  letter-spacing:0.5px;margin-top:1px;
+}
+
+.history-arrow{
+  font-size:11px;color:#444;
+  flex-shrink:0;
+  align-self:center;
+}
+
+.history-current{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.history-current-icon{
+  width:32px;height:32px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(80,232,122,0.3);
+  display:block;
+  flex-shrink:0;
+}
+
+.history-current-label{
+  font-size:12px;color:#50e87a;
+  letter-spacing:0.3px;
+  font-weight:700;
+}
+
 /* ── VIEW MODAL ── */
 #modal-overlay{
   position:fixed;
@@ -1047,6 +1137,10 @@ body{
         <div class="modal-desc" id="modal-desc"></div>
       </div>
       <button id="modal-edit-btn">✎ Edit This Territory</button>
+      <div id="modal-history-wrap" style="display:none;margin-top:14px;">
+        <div style="font-size:10px;color:#555;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;">Ownership History</div>
+        <div id="modal-history-chain"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2676,6 +2770,91 @@ territories.forEach((t, idx) => {
       openEditModal(idx);
     };
 
+    // Load ownership history from Firebase
+    const histWrap = document.getElementById("modal-history-wrap");
+    const histChain = document.getElementById("modal-history-chain");
+    histChain.innerHTML = "";
+    histWrap.style.display = "none";
+
+    db.ref("history/" + live.id).once("value", snap => {
+      const data = snap.val();
+      if(!data) return;
+      const entries = Object.entries(data).sort((a,b) => new Date(a[1].date) - new Date(b[1].date));
+      if(!entries.length) return;
+
+      histWrap.style.display = "block";
+      const chain = document.createElement("div");
+      chain.className = "history-chain";
+
+      entries.forEach(([key, entry]) => {
+        const row = document.createElement("div");
+        row.className = "history-entry";
+
+        const iconWrap = document.createElement("div");
+        iconWrap.className = "history-icon-wrap";
+
+        const img = document.createElement("img");
+        img.className = "history-icon";
+        img.src = entry.icon || "unc.png";
+        img.alt = entry.faction;
+        iconWrap.appendChild(img);
+
+        // Delete button (only visible in admin mode via CSS)
+        const delBtn = document.createElement("button");
+        delBtn.className = "history-delete-btn";
+        delBtn.textContent = "×";
+        delBtn.title = "Delete this history entry";
+        delBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          db.ref("history/" + live.id + "/" + key).remove();
+          row.remove();
+          const remaining = chain.querySelectorAll(".history-entry");
+          if(!remaining.length) histWrap.style.display = "none";
+        });
+        iconWrap.appendChild(delBtn);
+
+        const info = document.createElement("div");
+        info.className = "history-info";
+
+        const name = document.createElement("div");
+        name.className = "history-faction-name";
+        name.textContent = entry.faction;
+
+        const date = document.createElement("div");
+        date.className = "history-date";
+        const d = new Date(entry.date);
+        date.textContent = d.toLocaleDateString("en-GB", {day:"2-digit", month:"short", year:"numeric"});
+
+        info.appendChild(name);
+        info.appendChild(date);
+
+        const arrow = document.createElement("div");
+        arrow.className = "history-arrow";
+        arrow.textContent = "→";
+
+        row.appendChild(iconWrap);
+        row.appendChild(info);
+        row.appendChild(arrow);
+        chain.appendChild(row);
+      });
+
+      // Current owner at the end
+      const current = document.createElement("div");
+      current.className = "history-current";
+      const curImg = document.createElement("img");
+      curImg.className = "history-current-icon";
+      curImg.src = live.icon;
+      curImg.alt = live.controller;
+      const curLabel = document.createElement("div");
+      curLabel.className = "history-current-label";
+      curLabel.textContent = live.controller;
+      current.appendChild(curImg);
+      current.appendChild(curLabel);
+      chain.appendChild(current);
+
+      histChain.appendChild(chain);
+    });
+
     document.getElementById("modal-overlay").classList.add("open");
   }
 
@@ -2714,6 +2893,18 @@ document.getElementById("edit-save").addEventListener("click", () => {
   if(editingIdx === null) return;
   const t = territories[editingIdx];
   const newController = document.getElementById("edit-controller").value;
+  const oldController = t.controller;
+
+  // Push history entry if ownership is actually changing
+  if(oldController !== newController && oldController !== "Uncontrolled"){
+    const histRef = db.ref("history/" + t.id);
+    histRef.push({
+      faction: oldController,
+      icon: t.icon,
+      date: new Date().toISOString()
+    });
+  }
+
   t.name        = document.getElementById("edit-name").value.trim() || t.name;
   t.controller  = newController;
   t.status      = document.getElementById("edit-status").value;
@@ -2778,6 +2969,7 @@ function setAdminState(loggedIn, persist){
   } else if(!loggedIn){
     sessionStorage.removeItem(ADMIN_SESSION_KEY);
   }
+  document.body.classList.toggle("admin-mode", loggedIn);
   document.getElementById("admin-indicator").classList.toggle("visible", loggedIn);
   document.getElementById("login-btn").style.display  = loggedIn ? "none" : "flex";
   document.getElementById("logout-btn").style.display = loggedIn ? "flex" : "none";
