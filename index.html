@@ -368,6 +368,7 @@ body{
   display:flex;
   flex-direction:column;
   gap:6px;
+  touch-action:pan-y;
 }
 
 .history-entry{
@@ -380,6 +381,7 @@ body{
 .history-icon-wrap{
   position:relative;
   flex-shrink:0;
+  touch-action:manipulation;
 }
 
 .history-icon{
@@ -393,20 +395,29 @@ body{
 .history-delete-btn{
   display:none;
   position:absolute;
-  top:-4px;right:-4px;
-  width:14px;height:14px;
+  top:-6px;right:-6px;
+  width:20px;height:20px;
   background:#1a1a1a;
   border:1px solid rgba(255,80,80,0.5);
   border-radius:50%;
   color:#ff6060;
-  font-size:9px;
-  line-height:14px;
+  font-size:11px;
+  line-height:20px;
   text-align:center;
   cursor:pointer;
   z-index:2;
   padding:0;
   font-family:sans-serif;
   transition:background 0.15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  /* Expand tap target without changing visual size */
+  -webkit-tap-highlight-color:transparent;
+}
+.history-delete-btn::after{
+  content:"";
+  position:absolute;
+  inset:-8px;
 }
 .history-delete-btn:hover{ background:#ff3030; color:#fff; border-color:#ff3030; }
 body.admin-mode .history-delete-btn{ display:block; }
@@ -463,6 +474,7 @@ body.admin-mode .history-delete-btn{ display:block; }
   justify-content:center;
   align-items:center;
   z-index:99999;
+  touch-action:pan-y;
 }
 #modal-overlay.open{display:flex;}
 
@@ -1001,10 +1013,19 @@ body.admin-mode .history-delete-btn{ display:block; }
   .stats-icon{ width:19px; height:19px; }
   .stats-count{ font-size:12px; }
   .menu-item{ padding:14px 18px; font-size:15px; }
-  #modal-overlay{ align-items:flex-end; }
+  #modal-overlay{
+    align-items:flex-end;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
+    padding:5vh 0 0;
+  }
   .modal{
-    width:100%;max-width:100%;max-height:80vh;
+    width:100%;max-width:100%;
+    max-height:none;
     border-radius:16px 16px 0 0;
+    flex-shrink:0;
   }
   .modal-inner{ padding:20px 16px 28px; }
   #leaderboard-overlay{ align-items:flex-end; }
@@ -2804,13 +2825,16 @@ territories.forEach((t, idx) => {
         delBtn.className = "history-delete-btn";
         delBtn.textContent = "×";
         delBtn.title = "Delete this history entry";
-        delBtn.addEventListener("click", e => {
+        const doDelete = e => {
           e.stopPropagation();
+          e.preventDefault();
           db.ref("history/" + live.id + "/" + key).remove();
           row.remove();
           const remaining = chain.querySelectorAll(".history-entry");
           if(!remaining.length) histWrap.style.display = "none";
-        });
+        };
+        delBtn.addEventListener("click", doDelete);
+        delBtn.addEventListener("touchstart", doDelete, {passive:false});
         iconWrap.appendChild(delBtn);
 
         const info = document.createElement("div");
