@@ -15,7 +15,7 @@ body{
   color:white;
 }
 
-/* ── TOP-RIGHT HUD: wraps stats widget + menu widget side by side ── */
+/* ── TOP-RIGHT HUD ── */
 #top-right-hud{
   position:fixed;
   top:14px;
@@ -75,20 +75,18 @@ body{
   background:rgba(192,192,192,0.12);
 }
 
-/* ── MENU WIDGET (top-right) ── */
+/* ── MENU WIDGET ── */
 #menu-widget{
   display:flex;
   flex-direction:column;
   align-items:flex-end;
 }
 
-/* Pill wrapper — just the circle+label row, always visible */
 #menu-pill-wrap{
   position:relative;
   z-index:2;
 }
 
-/* Outer card — wraps pill + dropdown as one seamless block when open */
 #menu-card{
   background:transparent;
   border:1.5px solid transparent;
@@ -113,7 +111,6 @@ body{
   box-shadow:0 0 20px rgba(192,192,192,0.3);
 }
 
-/* The pill: logo circle + "Menu" text side by side */
 #menu-pill{
   display:flex;
   align-items:center;
@@ -126,7 +123,6 @@ body{
   white-space:nowrap;
 }
 
-/* Circle logo — 68px (slightly larger than stats widget) */
 #menu-logo{
   width:68px;
   height:68px;
@@ -145,7 +141,6 @@ body{
   box-shadow:none;
 }
 
-/* "Menu" label — hidden by default, slides in on hover/open */
 #menu-label{
   font-family:"Times New Roman",serif;
   font-size:15px;
@@ -166,7 +161,6 @@ body{
   padding-left:10px;
 }
 
-/* Chevron indicator */
 #menu-chevron{
   font-size:10px;
   color:rgba(192,192,192,0.5);
@@ -187,7 +181,6 @@ body{
 }
 #menu-card.open #menu-chevron{ transform:rotate(180deg); }
 
-/* Thin divider between pill and dropdown items */
 #menu-divider-line{
   height:1px;
   background:rgba(192,192,192,0.15);
@@ -195,7 +188,6 @@ body{
 }
 #menu-card.open #menu-divider-line{ display:block; }
 
-/* Dropdown — flows inside the card, no absolute positioning */
 #menu-dropdown{
   display:none;
   flex-direction:column;
@@ -227,15 +219,31 @@ body{
 .menu-item .menu-icon{ font-size:15px; opacity:0.7; }
 .menu-separator{ height:1px; background:rgba(255,255,255,0.07); }
 
-#toggle-nodes-btn{
+#toggle-nodes-btn, #logout-btn{
   box-sizing:border-box;
   appearance:none;
   -webkit-appearance:none;
 }
 
-/* ── UI SHELL: only used on mobile ── */
-#ui-shell{
-  display:contents;
+/* Admin indicator in menu */
+#admin-indicator{
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px 4px;
+  font-size:11px;
+  font-family:"Times New Roman",serif;
+  color:#888;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+#admin-indicator.visible{ display:flex; }
+#admin-dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:#50e87a;
+  box-shadow:0 0 6px #50e87a;
+  flex-shrink:0;
 }
 
 /* MAP */
@@ -257,16 +265,6 @@ body{
   top:0;
   left:0;
   transform-origin:0 0;
-}
-
-#bg-logo{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:50%;
-  opacity:0.05;
-  pointer-events:none;
 }
 
 #map-wrapper img.map{
@@ -345,13 +343,11 @@ body{
 .territory-group:hover .territory-icon,
 .territory-group:active .territory-icon{opacity:1;}
 
-/* ── MODAL ── */
+/* ── VIEW MODAL ── */
 #modal-overlay{
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  top:0;left:0;
+  width:100%;height:100%;
   background:rgba(0,0,0,0.7);
   display:none;
   justify-content:center;
@@ -390,11 +386,7 @@ body{
   position:absolute;
   inset:0;
   background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.07) 3px,
-    rgba(0,0,0,0.07) 4px
+    0deg,transparent,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px
   );
   pointer-events:none;
   z-index:0;
@@ -415,8 +407,7 @@ body{
 
 .modal-icon-wrap{
   flex-shrink:0;
-  width:72px;
-  height:72px;
+  width:72px;height:72px;
   border-radius:6px;
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.1);
@@ -427,36 +418,28 @@ body{
 }
 
 .modal-faction-icon{
-  width:100%;
-  height:100%;
+  width:100%;height:100%;
   object-fit:contain;
 }
 
 .modal-header-text{flex:1;min-width:0;}
 
 .modal-header-text h2{
-  font-size:17px;
-  font-weight:700;
-  letter-spacing:0.6px;
-  color:#f0f0f0;
+  font-size:17px;font-weight:700;
+  letter-spacing:0.6px;color:#f0f0f0;
   margin:0 0 4px 0;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 .modal-subtitle{
-  font-size:11px;
-  color:#555;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
+  font-size:11px;color:#555;
+  letter-spacing:1.5px;text-transform:uppercase;
 }
 
 .modal-divider{
   height:1px;
   background:linear-gradient(to right, var(--faction-color,#444), transparent);
-  margin-bottom:16px;
-  opacity:0.5;
+  margin-bottom:16px;opacity:0.5;
 }
 
 .modal-stats{
@@ -474,37 +457,23 @@ body{
 }
 
 .modal-stat .stat-label{
-  font-size:10px;
-  color:#555;
-  text-transform:uppercase;
-  letter-spacing:1.2px;
-  margin-bottom:4px;
+  font-size:10px;color:#555;
+  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px;
 }
 
 .modal-stat .stat-value{
-  font-size:14px;
-  font-weight:700;
-  color:#ddd;
-  letter-spacing:0.3px;
+  font-size:14px;font-weight:700;color:#ddd;letter-spacing:0.3px;
 }
 
 .modal-status-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:0.5px;
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:700;letter-spacing:0.5px;
 }
 
 .modal-status-badge::before{
-  content:"";
-  display:inline-block;
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:currentColor;
-  box-shadow:0 0 6px currentColor;
+  content:"";display:inline-block;
+  width:7px;height:7px;border-radius:50%;
+  background:currentColor;box-shadow:0 0 6px currentColor;
 }
 
 .badge-contested{ color:#ff6060; }
@@ -520,31 +489,283 @@ body{
 }
 
 .modal-desc{
-  font-size:13px;
-  color:#999;
-  line-height:1.75;
-  font-style:italic;
+  font-size:13px;color:#999;line-height:1.75;font-style:italic;
 }
 
 .modal-close{
-  position:absolute;
-  top:12px;
-  right:14px;
-  font-size:20px;
-  cursor:pointer;
-  color:#444;
-  transition:color 0.2s;
-  z-index:2;
-  line-height:1;
-  padding:4px 8px;
+  position:absolute;top:12px;right:14px;
+  font-size:20px;cursor:pointer;color:#444;
+  transition:color 0.2s;z-index:2;line-height:1;padding:4px 8px;
 }
 .modal-close:hover{ color:#bbb; }
 
+/* Admin edit button inside view modal */
+#modal-edit-btn{
+  display:none;
+  margin-top:14px;
+  width:100%;
+  padding:9px 0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:4px;
+  color:#ccc;
+  font-family:"Times New Roman",serif;
+  font-size:13px;
+  letter-spacing:0.8px;
+  cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+  text-transform:uppercase;
+}
+#modal-edit-btn:hover{ background:rgba(255,255,255,0.09); color:#fff; }
+#modal-edit-btn.visible{ display:block; }
+
+/* ── LOGIN MODAL ── */
+#login-overlay{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999999;
+}
+#login-overlay.open{ display:flex; }
+
+#login-box{
+  position:relative;
+  width:340px;
+  max-width:90vw;
+  background:#121212;
+  border-radius:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
+  animation:slideUp 0.25s ease;
+  font-family:"Times New Roman",serif;
+  overflow:hidden;
+}
+
+#login-accent{
+  height:3px;width:100%;
+  background:linear-gradient(90deg, #555, #aaa, #555);
+}
+
+#login-inner{
+  padding:28px 28px 24px;
+}
+
+#login-title{
+  font-size:16px;font-weight:700;
+  letter-spacing:1px;color:#e0e0e0;
+  text-transform:uppercase;margin-bottom:4px;
+}
+
+#login-sub{
+  font-size:11px;color:#444;letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:22px;
+}
+
+.login-field{
+  margin-bottom:14px;
+}
+
+.login-field label{
+  display:block;font-size:10px;color:#555;
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;
+}
+
+.login-field input{
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px;
+  padding:9px 12px;
+  color:#e0e0e0;
+  font-family:"Times New Roman",serif;
+  font-size:14px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.login-field input:focus{
+  border-color:rgba(255,255,255,0.3);
+}
+
+#login-error{
+  font-size:12px;color:#ff6060;
+  letter-spacing:0.3px;margin-bottom:14px;
+  display:none;min-height:18px;
+}
+#login-error.visible{ display:block; }
+
+#login-submit{
+  width:100%;
+  padding:10px 0;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:4px;
+  color:#e0e0e0;
+  font-family:"Times New Roman",serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background 0.15s, color 0.15s, border-color 0.15s;
+}
+#login-submit:hover{
+  background:rgba(255,255,255,0.14);
+  border-color:rgba(255,255,255,0.3);
+  color:#fff;
+}
+
+#login-close{
+  position:absolute;top:12px;right:14px;
+  font-size:20px;cursor:pointer;color:#444;
+  transition:color 0.2s;z-index:2;line-height:1;padding:4px 8px;
+}
+#login-close:hover{ color:#bbb; }
+
+/* ── EDIT MODAL ── */
+#edit-overlay{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999999;
+}
+#edit-overlay.open{ display:flex; }
+
+#edit-box{
+  position:relative;
+  width:480px;max-width:92vw;
+  max-height:88vh;overflow-y:auto;
+  background:#121212;
+  border-radius:8px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
+  animation:slideUp 0.25s ease;
+  font-family:"Times New Roman",serif;
+  overflow:hidden;
+}
+
+#edit-accent{
+  height:3px;width:100%;
+  background:linear-gradient(90deg,#50e87a,#30b85a);
+}
+
+#edit-inner{
+  padding:24px 26px 26px;
+}
+
+#edit-title{
+  font-size:15px;font-weight:700;
+  letter-spacing:0.8px;color:#e0e0e0;
+  margin-bottom:2px;
+}
+#edit-sub{
+  font-size:10px;color:#444;letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:20px;
+}
+
+.edit-field{
+  margin-bottom:16px;
+}
+
+.edit-field label{
+  display:block;font-size:10px;color:#555;
+  letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;
+}
+
+.edit-field input,
+.edit-field select,
+.edit-field textarea{
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px;
+  padding:9px 12px;
+  color:#e0e0e0;
+  font-family:"Times New Roman",serif;
+  font-size:13px;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.edit-field input:focus,
+.edit-field select:focus,
+.edit-field textarea:focus{
+  border-color:rgba(255,255,255,0.3);
+}
+.edit-field select{
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:30px;
+  cursor:pointer;
+}
+.edit-field select option{
+  background:#1a1a1a;
+  color:#e0e0e0;
+}
+.edit-field textarea{
+  resize:vertical;
+  min-height:80px;
+  line-height:1.6;
+}
+
+.edit-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.edit-actions{
+  display:flex;gap:10px;margin-top:20px;
+}
+
+.edit-btn{
+  flex:1;padding:10px 0;
+  border-radius:4px;
+  font-family:"Times New Roman",serif;
+  font-size:13px;font-weight:700;
+  letter-spacing:0.8px;text-transform:uppercase;
+  cursor:pointer;transition:0.15s;
+  border:1px solid;
+}
+
+#edit-save{
+  background:rgba(80,232,122,0.1);
+  border-color:rgba(80,232,122,0.35);
+  color:#50e87a;
+}
+#edit-save:hover{
+  background:rgba(80,232,122,0.2);
+  border-color:rgba(80,232,122,0.6);
+  color:#80ffaa;
+}
+
+#edit-cancel{
+  background:rgba(255,255,255,0.03);
+  border-color:rgba(255,255,255,0.1);
+  color:#666;
+}
+#edit-cancel:hover{
+  background:rgba(255,255,255,0.07);
+  border-color:rgba(255,255,255,0.2);
+  color:#aaa;
+}
+
+#edit-close{
+  position:absolute;top:12px;right:14px;
+  font-size:20px;cursor:pointer;color:#444;
+  transition:color 0.2s;z-index:2;line-height:1;padding:4px 8px;
+}
+#edit-close:hover{ color:#bbb; }
+
 /* ── LEADERBOARD MODAL ── */
 #leaderboard-overlay{
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
   background:rgba(0,0,0,0.7);
   display:none;
   justify-content:center;
@@ -555,115 +776,67 @@ body{
 
 #leaderboard-box{
   position:relative;
-  width:420px;
-  max-width:92vw;
-  max-height:85vh;
+  width:420px;max-width:92vw;max-height:85vh;
   overflow-y:auto;
-  background:#121212;
-  border-radius:4px;
+  background:#121212;border-radius:4px;
   box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
   animation:slideUp 0.25s ease;
   font-family:"Times New Roman",serif;
 }
 
 #leaderboard-box::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,transparent 3px,
-    rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px
-  );
-  pointer-events:none;
-  z-index:0;
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px);
+  pointer-events:none;z-index:0;
 }
 
 #leaderboard-inner{
-  position:relative;
-  z-index:1;
+  position:relative;z-index:1;
   padding:22px 24px 26px;
 }
 
 #leaderboard-title{
-  font-size:16px;
-  font-weight:700;
-  letter-spacing:1.2px;
-  color:#f0f0f0;
-  text-transform:uppercase;
-  margin-bottom:4px;
+  font-size:16px;font-weight:700;letter-spacing:1.2px;
+  color:#f0f0f0;text-transform:uppercase;margin-bottom:4px;
 }
 
 #leaderboard-sub{
-  font-size:10px;
-  color:#555;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  margin-bottom:16px;
+  font-size:10px;color:#555;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:16px;
 }
 
 .lb-divider{
-  height:1px;
-  background:rgba(192,192,192,0.1);
-  margin-bottom:14px;
+  height:1px;background:rgba(192,192,192,0.1);margin-bottom:14px;
 }
 
 .lb-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:8px 10px;
-  border-radius:4px;
-  margin-bottom:6px;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:4px;margin-bottom:6px;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
 }
 
 .lb-rank{
-  font-size:12px;
-  font-weight:700;
-  color:#555;
-  letter-spacing:0.5px;
-  min-width:22px;
-  text-align:center;
+  font-size:12px;font-weight:700;color:#555;
+  letter-spacing:0.5px;min-width:22px;text-align:center;
 }
 
-.lb-icons{
-  display:flex;
-  align-items:center;
-  gap:3px;
-  flex-shrink:0;
-}
+.lb-icons{display:flex;align-items:center;gap:3px;flex-shrink:0;}
 
 .lb-icon{
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid rgba(192,192,192,0.25);
-  display:block;
+  width:26px;height:26px;border-radius:50%;
+  object-fit:cover;border:1px solid rgba(192,192,192,0.25);display:block;
 }
 
-.lb-names{
-  flex:1;
-  min-width:0;
-}
+.lb-names{flex:1;min-width:0;}
 
 .lb-name{
-  font-size:12px;
-  color:#ccc;
-  letter-spacing:0.3px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:12px;color:#ccc;letter-spacing:0.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 .lb-count{
-  font-size:13px;
-  font-weight:700;
-  color:#e8e8e8;
-  letter-spacing:0.5px;
-  flex-shrink:0;
+  font-size:13px;font-weight:700;color:#e8e8e8;
+  letter-spacing:0.5px;flex-shrink:0;
 }
 
 .lb-row.rank-1{
@@ -674,70 +847,63 @@ body{
 .lb-row.rank-1 .lb-count{ color:#ffd700; }
 
 #leaderboard-close{
-  position:absolute;
-  top:12px; right:14px;
-  font-size:20px;
-  cursor:pointer;
-  color:#444;
-  transition:color 0.2s;
-  z-index:2;
-  line-height:1;
-  padding:4px 8px;
+  position:absolute;top:12px;right:14px;
+  font-size:20px;cursor:pointer;color:#444;
+  transition:color 0.2s;z-index:2;line-height:1;padding:4px 8px;
 }
 #leaderboard-close:hover{ color:#bbb; }
 
-@media (max-width:600px){
-  #leaderboard-box{
-    width:100%; max-width:100%; max-height:80vh;
-    border-radius:16px 16px 0 0;
-  }
-  #leaderboard-inner{ padding:20px 16px 28px; }
-  #leaderboard-overlay{ align-items:flex-end; }
+/* ── SAVE TOAST ── */
+#save-toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1a1a1a;
+  border:1px solid rgba(80,232,122,0.3);
+  border-radius:6px;
+  padding:10px 20px;
+  font-family:"Times New Roman",serif;
+  font-size:13px;color:#50e87a;letter-spacing:0.5px;
+  opacity:0;transition:opacity 0.3s, transform 0.3s;
+  z-index:9999999;pointer-events:none;
 }
+#save-toast.show{
+  opacity:1;transform:translateX(-50%) translateY(0);
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width:600px){
   #top-right-hud{ top:10px; right:10px; gap:6px; }
   #menu-logo{ width:54px; height:54px; }
   #stats-widget{ padding:4px 8px; min-width:56px; }
   .stats-icon{ width:19px; height:19px; }
   .stats-count{ font-size:12px; }
-
-  #menu-card.open #menu-label{
-    font-size:14px; max-width:120px; opacity:1; padding-left:10px;
-  }
-  #menu-card.open #menu-chevron{
-    max-width:20px; opacity:1; margin-left:6px; margin-right:10px;
-  }
-
   .menu-item{ padding:14px 18px; font-size:15px; }
-  .menu-item .menu-icon{ font-size:17px; }
-
   #modal-overlay{ align-items:flex-end; }
   .modal{
-    width:100%;
-    max-width:100%;
-    max-height:80vh;
+    width:100%;max-width:100%;max-height:80vh;
     border-radius:16px 16px 0 0;
   }
   .modal-inner{ padding:20px 16px 28px; }
-  .modal-icon-wrap{ width:56px; height:56px; padding:6px; }
-  .modal-header-text h2{ font-size:16px; }
-  .modal-subtitle{ font-size:10px; }
-  .modal-stats{ grid-template-columns:1fr 1fr; gap:6px; }
-  .modal-stat{ padding:8px 10px; }
-  .modal-stat .stat-label{ font-size:9px; }
-  .modal-stat .stat-value{ font-size:13px; }
-  .modal-desc{ font-size:13px; line-height:1.65; }
-  .modal-close{ font-size:26px; top:10px; right:12px; padding:6px 10px; }
+  #leaderboard-overlay{ align-items:flex-end; }
+  #leaderboard-box{
+    width:100%;max-width:100%;max-height:80vh;
+    border-radius:16px 16px 0 0;
+  }
+  #edit-overlay{ align-items:flex-end; }
+  #edit-box{
+    width:100%;max-width:100%;
+    border-radius:16px 16px 0 0;
+  }
+  .edit-row{ grid-template-columns:1fr; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- Top-right HUD: stats widget + menu widget side by side -->
+<!-- TOP-RIGHT HUD -->
 <div id="top-right-hud">
 
-  <!-- Stats widget: leading faction (top) + uncontrolled count (bottom) -->
   <div id="stats-widget">
     <div class="stats-row" id="stats-top-row"></div>
     <div class="stats-divider"></div>
@@ -747,7 +913,6 @@ body{
     </div>
   </div>
 
-  <!-- Menu widget: pill + dropdown inside one seamless card -->
   <div id="menu-widget">
     <div id="menu-card">
       <div id="menu-pill">
@@ -757,6 +922,7 @@ body{
       </div>
       <div id="menu-divider-line"></div>
       <div id="menu-dropdown">
+        <div id="admin-indicator"><span id="admin-dot"></span>Admin Session</div>
         <a class="menu-item" href="https://docs.google.com/document/d/1uo7Kn0eOoMWLEY8FDHopDWbpXySb-J01I7ewMGmW6XQ/edit?tab=t.0" target="_blank">
           <span class="menu-icon">📋</span> Warfare Rules
         </a>
@@ -767,6 +933,13 @@ body{
         <div class="menu-separator"></div>
         <button class="menu-item" id="toggle-nodes-btn">
           <span class="menu-icon">🗺️</span> Borders Only
+        </button>
+        <div class="menu-separator"></div>
+        <button class="menu-item" id="login-btn">
+          <span class="menu-icon">🔐</span> Admin Login
+        </button>
+        <button class="menu-item" id="logout-btn" style="display:none;">
+          <span class="menu-icon">🚪</span> Logout
         </button>
       </div>
     </div>
@@ -782,7 +955,7 @@ body{
   </div>
 </div>
 
-<!-- Modal -->
+<!-- VIEW MODAL -->
 <div id="modal-overlay">
   <div class="modal" id="modal-box">
     <div class="modal-accent-bar" id="modal-accent-bar"></div>
@@ -819,11 +992,103 @@ body{
       <div class="modal-desc-wrap" id="modal-desc-wrap">
         <div class="modal-desc" id="modal-desc"></div>
       </div>
+      <button id="modal-edit-btn">✎ Edit This Territory</button>
     </div>
   </div>
 </div>
 
-<!-- Leaderboard modal -->
+<!-- LOGIN MODAL -->
+<div id="login-overlay">
+  <div id="login-box">
+    <div id="login-accent"></div>
+    <div id="login-inner">
+      <div id="login-close">×</div>
+      <div id="login-title">Admin Access</div>
+      <div id="login-sub">Restricted — Authorised Personnel Only</div>
+      <div class="login-field">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="login-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="off">
+      </div>
+      <div id="login-error">Incorrect username or password.</div>
+      <button id="login-submit">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-overlay">
+  <div id="edit-box">
+    <div id="edit-accent"></div>
+    <div id="edit-inner">
+      <div id="edit-close">×</div>
+      <div id="edit-title">Edit Territory</div>
+      <div id="edit-sub">Admin Mode — Changes Save Immediately</div>
+
+      <div class="edit-field">
+        <label for="edit-name">Territory Name</label>
+        <input type="text" id="edit-name" placeholder="e.g. The Dark Valley">
+      </div>
+
+      <div class="edit-field">
+        <label for="edit-controller">Controller Faction</label>
+        <select id="edit-controller">
+          <option value="Uncontrolled">Uncontrolled</option>
+          <option value="Loners">Loners</option>
+          <option value="Duty">Duty</option>
+          <option value="Freedom">Freedom</option>
+          <option value="Bandits">Bandits</option>
+          <option value="Monolith">Monolith</option>
+          <option value="Ukranian Military">Ukranian Military</option>
+          <option value="Ecologists">Ecologists</option>
+          <option value="Mercenaries">Mercenaries</option>
+          <option value="Clear Sky">Clear Sky</option>
+        </select>
+      </div>
+
+      <div class="edit-row">
+        <div class="edit-field">
+          <label for="edit-status">Status</label>
+          <select id="edit-status">
+            <option value="neutral">Neutral</option>
+            <option value="controlled">Controlled</option>
+            <option value="contested">Contested</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label for="edit-status-label">Status Label</label>
+          <input type="text" id="edit-status-label" placeholder="e.g. Contested">
+        </div>
+      </div>
+
+      <div class="edit-row">
+        <div class="edit-field">
+          <label for="edit-size">Territory Size</label>
+          <input type="text" id="edit-size" placeholder="e.g. Large">
+        </div>
+        <div class="edit-field">
+          <label for="edit-value">Strategic Value</label>
+          <input type="text" id="edit-value" placeholder="e.g. ⭐⭐⭐">
+        </div>
+      </div>
+
+      <div class="edit-field">
+        <label for="edit-desc">Description</label>
+        <textarea id="edit-desc" rows="4" placeholder="Describe this territory..."></textarea>
+      </div>
+
+      <div class="edit-actions">
+        <button class="edit-btn" id="edit-save">Save Changes</button>
+        <button class="edit-btn" id="edit-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD MODAL -->
 <div id="leaderboard-overlay">
   <div id="leaderboard-box">
     <div id="leaderboard-inner">
@@ -836,176 +1101,23 @@ body{
   </div>
 </div>
 
+<!-- SAVE TOAST -->
+<div id="save-toast">Territory updated successfully.</div>
+
 <script>
-let scale, minScale;
-let originX, originY;
+/* ── ADMIN CREDENTIALS ── */
+/* Change these to whatever you want */
+const ADMIN_USERNAME = "eocadmin";
+const ADMIN_PASSWORD = "eocnodemappass";
 
-const container = document.getElementById("map-container");
-const wrapper   = document.getElementById("map-wrapper");
-const mapImg    = document.getElementById("map-img");
-const overlay   = document.getElementById("modal-overlay");
+/* ── SESSION STATE ── */
+let isAdmin = false;
 
-function hexToRGBA(hex, alpha){
-  const r=parseInt(hex.substring(1,3),16);
-  const g=parseInt(hex.substring(3,5),16);
-  const b=parseInt(hex.substring(5,7),16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
+/* ── STORAGE KEY PREFIX ── */
+const STORE_PREFIX = "territory_";
 
-function isMobile(){ return window.innerWidth <= 768; }
-
-function init(){
-  const cW = container.clientWidth;
-  const cH = container.clientHeight;
-  const mW = mapImg.naturalWidth;
-  const mH = mapImg.naturalHeight;
-  if(!mW || !mH) return;
-
-  wrapper.style.width  = mW + "px";
-  wrapper.style.height = mH + "px";
-
-  const scaleW = cW / mW;
-  const scaleH = cH / mH;
-  const fitBoth = Math.min(scaleW, scaleH);
-
-  if(isMobile()){
-    minScale = scaleW;
-  } else {
-    minScale = fitBoth;
-  }
-
-  scale = minScale;
-  originX = (cW - mW * scale) / 2;
-  originY = (cH - mH * scale) / 2;
-  apply();
-}
-
-if(mapImg.complete && mapImg.naturalWidth > 0){
-  init();
-} else {
-  mapImg.onload = init;
-}
-window.addEventListener("resize", init);
-
-function apply(){
-  wrapper.style.transform = `translate(${originX}px,${originY}px) scale(${scale})`;
-}
-
-function clamp(){
-  const cW = container.clientWidth;
-  const cH = container.clientHeight;
-  const mW = mapImg.naturalWidth;
-  const mH = mapImg.naturalHeight;
-  const sw = mW * scale;
-  const sh = mH * scale;
-
-  if(sw <= cW){ originX = (cW - sw) / 2; }
-  else { originX = Math.min(0, Math.max(cW - sw, originX)); }
-
-  if(sh <= cH){ originY = (cH - sh) / 2; }
-  else { originY = Math.min(0, Math.max(cH - sh, originY)); }
-}
-
-/* WHEEL ZOOM */
-container.addEventListener("wheel", e => {
-  e.preventDefault();
-  const rect   = wrapper.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-  const zoom   = e.deltaY < 0 ? 1.1 : 0.9;
-  let newScale = Math.max(minScale, scale * zoom);
-  const ratio  = newScale / scale;
-  originX = e.clientX - mouseX * ratio;
-  originY = e.clientY - mouseY * ratio;
-  scale   = newScale;
-  clamp();
-  apply();
-}, {passive:false});
-
-/* MOUSE PAN */
-let dragging=false, lastX=0, lastY=0;
-let dragStartX=0, dragStartY=0, didPan=false;
-const PAN_THRESHOLD = 4;
-
-container.addEventListener("mousedown", e => {
-  dragging=true; didPan=false;
-  lastX=dragStartX=e.clientX;
-  lastY=dragStartY=e.clientY;
-  container.classList.add("grabbing");
-});
-window.addEventListener("mouseup", () => {
-  dragging=false;
-  container.classList.remove("grabbing");
-});
-window.addEventListener("mousemove", e => {
-  if(!dragging) return;
-  originX += e.clientX - lastX;
-  originY += e.clientY - lastY;
-  lastX=e.clientX; lastY=e.clientY;
-  if(Math.abs(e.clientX-dragStartX)>PAN_THRESHOLD || Math.abs(e.clientY-dragStartY)>PAN_THRESHOLD) didPan=true;
-  clamp(); apply();
-});
-
-/* TOUCH */
-let tapStartX=0, tapStartY=0, wasTap=false;
-let lastTouchDist=0;
-const TAP_THRESHOLD = 10;
-
-container.addEventListener("touchstart", e => {
-  e.preventDefault();
-  if(e.touches.length === 1){
-    dragging=true; wasTap=true;
-    lastX=tapStartX=e.touches[0].clientX;
-    lastY=tapStartY=e.touches[0].clientY;
-  } else if(e.touches.length === 2){
-    dragging=false; wasTap=false;
-    lastTouchDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  }
-},{passive:false});
-
-container.addEventListener("touchmove", e => {
-  e.preventDefault();
-  if(e.touches.length === 1 && dragging){
-    const dx = e.touches[0].clientX - lastX;
-    const dy = e.touches[0].clientY - lastY;
-    originX += dx; originY += dy;
-    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
-    if(Math.abs(e.touches[0].clientX-tapStartX)>TAP_THRESHOLD ||
-       Math.abs(e.touches[0].clientY-tapStartY)>TAP_THRESHOLD) wasTap=false;
-    clamp(); apply();
-  } else if(e.touches.length === 2){
-    const dist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    if(!lastTouchDist){ lastTouchDist=dist; return; }
-    const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-    const rect = wrapper.getBoundingClientRect();
-    const mX   = midX - rect.left;
-    const mY   = midY - rect.top;
-    let newScale = Math.max(minScale, scale * (dist / lastTouchDist));
-    const ratio  = newScale / scale;
-    originX = midX - mX * ratio;
-    originY = midY - mY * ratio;
-    scale   = newScale;
-    lastTouchDist = dist;
-    clamp(); apply();
-  }
-},{passive:false});
-
-container.addEventListener("touchend", e => {
-  if(e.touches.length === 0){
-    dragging=false; lastTouchDist=0;
-    setTimeout(() => { wasTap=false; }, 100);
-  }
-},{passive:true});
-
-/* TERRITORIES */ /* loners:#bd983c ; mono:#03f2ff ; duty:#b30909 ; bandit:#fcfcfc ; freedom:#10e649; mili:#024f0d */
-const territories=[
+/* ── DEFAULT TERRITORY DATA ── */
+const defaultTerritories = [
   {
     id:1,color:"#0a0a0a",icon:"unc.png",
     path:"M 0.12884093,1.2884093 4.1873302,1.2561991 4.7026938,1.9970344 3.8330176,3.9618586 4.0584892,4.3161711 0.03221023,4.4772222 Z",
@@ -1064,137 +1176,282 @@ const territories=[
   }
 ];
 
-/* ── FACTION DATA: shared computation ── */
+/* ── ICON MAP: faction name → icon file ── */
+const factionIcons = {
+  "Uncontrolled":"unc.png",
+  "Loners":"loner.png",
+  "Duty":"duty.png",
+  "Freedom":"freedom.png",
+  "Bandits":"bandit.png",
+  "Monolith":"mono.png",
+  "Ukranian Military":"mili.png",
+  "Ecologists":"loner.png",
+  "Mercenaries":"loner.png",
+  "Clear Sky":"loner.png"
+};
+
+/* ── FACTION COLOR MAP ── */
+const factionColors = {
+  "Uncontrolled":"#0a0a0a",
+  "Loners":"#bd983c",
+  "Duty":"#b30909",
+  "Freedom":"#10e649",
+  "Bandits":"#ffffff",
+  "Monolith":"#00a5b8",
+  "Ukranian Military":"#024f0d",
+  "Ecologists":"#7aad30",
+  "Mercenaries":"#888888",
+  "Clear Sky":"#4090cc"
+};
+
+/* ── LOAD TERRITORY STATE FROM STORAGE ── */
+let territories = defaultTerritories.map(t => Object.assign({}, t));
+
+function loadSavedData(){
+  territories.forEach((t, i) => {
+    const key = STORE_PREFIX + t.id;
+    try {
+      const raw = localStorage.getItem(key);
+      if(raw){
+        const saved = JSON.parse(raw);
+        territories[i] = Object.assign({}, t, saved);
+      }
+    } catch(e){}
+  });
+}
+
+function saveTerritoryData(t){
+  const key = STORE_PREFIX + t.id;
+  const toSave = {
+    name: t.name,
+    subtitle: t.subtitle,
+    controller: t.controller,
+    status: t.status,
+    statusLabel: t.statusLabel,
+    size: t.size,
+    value: t.value,
+    desc: t.desc,
+    color: t.color,
+    icon: t.icon
+  };
+  try {
+    localStorage.setItem(key, JSON.stringify(toSave));
+  } catch(e){}
+}
+
+loadSavedData();
+
+/* ── HELPERS ── */
+function hexToRGBA(hex, alpha){
+  const r=parseInt(hex.substring(1,3),16);
+  const g=parseInt(hex.substring(3,5),16);
+  const b=parseInt(hex.substring(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function isMobile(){ return window.innerWidth <= 768; }
+
+/* ── MAP PAN/ZOOM ── */
+let scale, minScale;
+let originX, originY;
+
+const container = document.getElementById("map-container");
+const wrapper   = document.getElementById("map-wrapper");
+const mapImg    = document.getElementById("map-img");
+
+function init(){
+  const cW = container.clientWidth;
+  const cH = container.clientHeight;
+  const mW = mapImg.naturalWidth;
+  const mH = mapImg.naturalHeight;
+  if(!mW || !mH) return;
+  wrapper.style.width  = mW + "px";
+  wrapper.style.height = mH + "px";
+  const scaleW = cW / mW;
+  const scaleH = cH / mH;
+  const fitBoth = Math.min(scaleW, scaleH);
+  minScale = isMobile() ? scaleW : fitBoth;
+  scale = minScale;
+  originX = (cW - mW * scale) / 2;
+  originY = (cH - mH * scale) / 2;
+  apply();
+}
+
+if(mapImg.complete && mapImg.naturalWidth > 0){ init(); }
+else { mapImg.onload = init; }
+window.addEventListener("resize", init);
+
+function apply(){
+  wrapper.style.transform = `translate(${originX}px,${originY}px) scale(${scale})`;
+}
+
+function clamp(){
+  const cW = container.clientWidth, cH = container.clientHeight;
+  const mW = mapImg.naturalWidth,   mH = mapImg.naturalHeight;
+  const sw = mW * scale, sh = mH * scale;
+  if(sw <= cW){ originX = (cW - sw) / 2; }
+  else { originX = Math.min(0, Math.max(cW - sw, originX)); }
+  if(sh <= cH){ originY = (cH - sh) / 2; }
+  else { originY = Math.min(0, Math.max(cH - sh, originY)); }
+}
+
+container.addEventListener("wheel", e => {
+  e.preventDefault();
+  const rect   = wrapper.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  const zoom   = e.deltaY < 0 ? 1.1 : 0.9;
+  let newScale = Math.max(minScale, scale * zoom);
+  const ratio  = newScale / scale;
+  originX = e.clientX - mouseX * ratio;
+  originY = e.clientY - mouseY * ratio;
+  scale   = newScale;
+  clamp(); apply();
+},{passive:false});
+
+let dragging=false, lastX=0, lastY=0;
+let dragStartX=0, dragStartY=0, didPan=false;
+const PAN_THRESHOLD = 4;
+
+container.addEventListener("mousedown", e => {
+  dragging=true; didPan=false;
+  lastX=dragStartX=e.clientX; lastY=dragStartY=e.clientY;
+  container.classList.add("grabbing");
+});
+window.addEventListener("mouseup", () => { dragging=false; container.classList.remove("grabbing"); });
+window.addEventListener("mousemove", e => {
+  if(!dragging) return;
+  originX += e.clientX - lastX; originY += e.clientY - lastY;
+  lastX=e.clientX; lastY=e.clientY;
+  if(Math.abs(e.clientX-dragStartX)>PAN_THRESHOLD || Math.abs(e.clientY-dragStartY)>PAN_THRESHOLD) didPan=true;
+  clamp(); apply();
+});
+
+let tapStartX=0, tapStartY=0, wasTap=false, lastTouchDist=0;
+const TAP_THRESHOLD = 10;
+
+container.addEventListener("touchstart", e => {
+  e.preventDefault();
+  if(e.touches.length === 1){
+    dragging=true; wasTap=true;
+    lastX=tapStartX=e.touches[0].clientX; lastY=tapStartY=e.touches[0].clientY;
+  } else if(e.touches.length === 2){
+    dragging=false; wasTap=false;
+    lastTouchDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  }
+},{passive:false});
+
+container.addEventListener("touchmove", e => {
+  e.preventDefault();
+  if(e.touches.length === 1 && dragging){
+    const dx = e.touches[0].clientX - lastX;
+    const dy = e.touches[0].clientY - lastY;
+    originX += dx; originY += dy;
+    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY;
+    if(Math.abs(e.touches[0].clientX-tapStartX)>TAP_THRESHOLD || Math.abs(e.touches[0].clientY-tapStartY)>TAP_THRESHOLD) wasTap=false;
+    clamp(); apply();
+  } else if(e.touches.length === 2){
+    const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    if(!lastTouchDist){ lastTouchDist=dist; return; }
+    const midX = (e.touches[0].clientX+e.touches[1].clientX)/2;
+    const midY = (e.touches[0].clientY+e.touches[1].clientY)/2;
+    const rect = wrapper.getBoundingClientRect();
+    let newScale = Math.max(minScale, scale*(dist/lastTouchDist));
+    const ratio  = newScale/scale;
+    originX = midX - (midX-rect.left)*ratio;
+    originY = midY - (midY-rect.top)*ratio;
+    scale   = newScale; lastTouchDist = dist;
+    clamp(); apply();
+  }
+},{passive:false});
+
+container.addEventListener("touchend", e => {
+  if(e.touches.length === 0){ dragging=false; lastTouchDist=0; setTimeout(()=>{wasTap=false;},100); }
+},{passive:true});
+
+/* ── FACTION STATS ── */
 function computeFactionData(){
   const UNC = "Uncontrolled";
   const counts = {};
   let uncCount = 0;
-
   territories.forEach(t => {
-    if(t.controller === UNC){
-      uncCount++;
-    } else {
-      if(!counts[t.controller]) counts[t.controller] = { count:0, icon:t.icon, name:t.controller };
+    if(t.controller === UNC){ uncCount++; }
+    else {
+      if(!counts[t.controller]) counts[t.controller] = {count:0, icon:t.icon, name:t.controller};
       counts[t.controller].count++;
     }
   });
-
-  // Build sorted tiers: group factions with equal counts together
   const sorted = Object.values(counts).sort((a,b) => b.count - a.count);
   const tiers = [];
   sorted.forEach(faction => {
-    const last = tiers[tiers.length - 1];
-    if(last && last[0].count === faction.count){
-      last.push(faction);
-    } else {
-      tiers.push([faction]);
-    }
+    const last = tiers[tiers.length-1];
+    if(last && last[0].count === faction.count){ last.push(faction); }
+    else { tiers.push([faction]); }
   });
-
-  return { tiers, uncCount };
+  return {tiers, uncCount};
 }
 
-/* ── STATS WIDGET: render top row with tie support ── */
-(function renderStats(){
-  const { tiers, uncCount } = computeFactionData();
-
+function renderStats(){
+  const {tiers, uncCount} = computeFactionData();
   const topRow = document.getElementById("stats-top-row");
   document.getElementById("stats-unc-count").textContent = "#" + uncCount;
-
-  if(!tiers.length){
-    topRow.style.display = "none";
-    return;
-  }
-
-  const topTier = tiers[0];
-
-  // Clear existing content in top row and rebuild
   topRow.innerHTML = "";
-
-  // Icons group (side by side for ties)
+  if(!tiers.length){ topRow.style.display="none"; return; }
+  const topTier = tiers[0];
   const iconsWrap = document.createElement("div");
   iconsWrap.style.cssText = "display:flex;align-items:center;gap:3px;flex-shrink:0;";
   topTier.forEach(f => {
     const img = document.createElement("img");
-    img.className = "stats-icon";
-    img.src = f.icon;
-    img.alt = f.name;
+    img.className="stats-icon"; img.src=f.icon; img.alt=f.name;
     iconsWrap.appendChild(img);
   });
-
   const countSpan = document.createElement("span");
-  countSpan.className = "stats-count";
-  countSpan.textContent = "#" + topTier[0].count;
+  countSpan.className="stats-count"; countSpan.textContent="#"+topTier[0].count;
+  topRow.appendChild(iconsWrap); topRow.appendChild(countSpan);
+}
 
-  topRow.appendChild(iconsWrap);
-  topRow.appendChild(countSpan);
-})();
-
-/* ── LEADERBOARD: build rows ── */
 function buildLeaderboard(){
-  const { tiers } = computeFactionData();
-  const container = document.getElementById("leaderboard-rows");
-  container.innerHTML = "";
-
+  const {tiers} = computeFactionData();
+  const cont = document.getElementById("leaderboard-rows");
+  cont.innerHTML = "";
   if(!tiers.length){
-    container.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:16px;">No controlled territories yet.</div>';
+    cont.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:16px;">No controlled territories yet.</div>';
     return;
   }
-
   tiers.forEach((tier, idx) => {
-    const rank = idx + 1;
+    const rank = idx+1;
     const row = document.createElement("div");
-    row.className = "lb-row" + (rank === 1 ? " rank-1" : "");
-
-    const rankEl = document.createElement("div");
-    rankEl.className = "lb-rank";
-    rankEl.textContent = "#" + rank;
-
-    const iconsEl = document.createElement("div");
-    iconsEl.className = "lb-icons";
+    row.className = "lb-row"+(rank===1?" rank-1":"");
+    const rankEl = document.createElement("div"); rankEl.className="lb-rank"; rankEl.textContent="#"+rank;
+    const iconsEl = document.createElement("div"); iconsEl.className="lb-icons";
     tier.forEach(f => {
-      const img = document.createElement("img");
-      img.className = "lb-icon";
-      img.src = f.icon;
-      img.alt = f.name;
+      const img = document.createElement("img"); img.className="lb-icon"; img.src=f.icon; img.alt=f.name;
       iconsEl.appendChild(img);
     });
-
-    const namesEl = document.createElement("div");
-    namesEl.className = "lb-names";
-    namesEl.innerHTML = tier.map(f =>
-      `<div class="lb-name">${f.name}</div>`
-    ).join("");
-
-    const countEl = document.createElement("div");
-    countEl.className = "lb-count";
-    countEl.textContent = tier[0].count + (tier[0].count === 1 ? " node" : " nodes");
-
-    row.appendChild(rankEl);
-    row.appendChild(iconsEl);
-    row.appendChild(namesEl);
-    row.appendChild(countEl);
-    container.appendChild(row);
+    const namesEl = document.createElement("div"); namesEl.className="lb-names";
+    namesEl.innerHTML = tier.map(f=>`<div class="lb-name">${f.name}</div>`).join("");
+    const countEl = document.createElement("div"); countEl.className="lb-count";
+    countEl.textContent = tier[0].count+(tier[0].count===1?" node":" nodes");
+    row.appendChild(rankEl); row.appendChild(iconsEl); row.appendChild(namesEl); row.appendChild(countEl);
+    cont.appendChild(row);
   });
 }
 
-/* ── BUILD TERRITORY SVG ── */
+/* ── BUILD SVG TERRITORIES ── */
 const svg = document.getElementById("territory-svg");
+const svgGroups = [];
 
-territories.forEach(t => {
+territories.forEach((t, idx) => {
   const g = document.createElementNS("http://www.w3.org/2000/svg","g");
   g.setAttribute("class","territory-group");
 
-  const poly = document.createElementNS("http://www.w3.org/2000/svg", t.path ? "path" : "polygon");
-  if(t.path){ poly.setAttribute("d", t.path); }
-  else { poly.setAttribute("points", t.points.map(p=>p.join(",")).join(" ")); }
+  const poly = document.createElementNS("http://www.w3.org/2000/svg","path");
+  poly.setAttribute("d", t.path);
   poly.setAttribute("class","territory-poly");
   poly.style.fill = hexToRGBA(t.color, 0.19);
 
-  // Pink outer outline — same path, wider stroke, rendered behind the silver border
-  const outline = document.createElementNS("http://www.w3.org/2000/svg", t.path ? "path" : "polygon");
-  if(t.path){ outline.setAttribute("d", t.path); }
-  else { outline.setAttribute("points", t.points.map(p=>p.join(",")).join(" ")); }
+  const outline = document.createElementNS("http://www.w3.org/2000/svg","path");
+  outline.setAttribute("d", t.path);
   outline.setAttribute("class","territory-poly-outline");
 
   const iconSize = 1.9;
@@ -1204,51 +1461,177 @@ territories.forEach(t => {
 
   const icon = document.createElementNS("http://www.w3.org/2000/svg","image");
   icon.setAttribute("href", t.icon);
-  icon.setAttribute("width", iconSize);
-  icon.setAttribute("height", iconSize);
+  icon.setAttribute("width", iconSize); icon.setAttribute("height", iconSize);
   icon.setAttribute("class","territory-icon");
 
-  g.appendChild(outline);
-  g.appendChild(poly);
-  g.appendChild(label);
-  g.appendChild(icon);
+  g.appendChild(outline); g.appendChild(poly); g.appendChild(label); g.appendChild(icon);
   svg.appendChild(g);
+  svgGroups.push({g, poly, icon, label, t});
 
   requestAnimationFrame(() => {
     const bb = poly.getBBox();
-    const cx = bb.x + bb.width  / 2;
-    const cy = bb.y + bb.height / 2;
-    label.setAttribute("x", cx);
-    label.setAttribute("y", cy);
-    icon.setAttribute("x", cx - iconSize/2);
-    icon.setAttribute("y", cy - iconSize/2);
+    const cx = bb.x + bb.width/2;
+    const cy = bb.y + bb.height/2;
+    label.setAttribute("x", cx); label.setAttribute("y", cy);
+    icon.setAttribute("x", cx - iconSize/2); icon.setAttribute("y", cy - iconSize/2);
   });
 
-  function openModal(){
-    document.getElementById("modal-title").textContent      = t.name || "Territory "+t.id;
-    document.getElementById("modal-subtitle").textContent   = t.subtitle || "";
-    document.getElementById("modal-icon").src               = t.icon;
-    document.getElementById("modal-controller").textContent = t.controller || "Unknown";
-    document.getElementById("modal-size").textContent       = t.size || "Unknown";
-    document.getElementById("modal-value").textContent      = t.value || "—";
-    document.getElementById("modal-desc").textContent       = t.desc || "";
+  function openViewModal(){
+    const live = territories[idx];
+    document.getElementById("modal-title").textContent      = live.name || "Territory "+live.id;
+    document.getElementById("modal-subtitle").textContent   = live.subtitle || "";
+    document.getElementById("modal-icon").src               = live.icon;
+    document.getElementById("modal-controller").textContent = live.controller || "Unknown";
+    document.getElementById("modal-size").textContent       = live.size || "Unknown";
+    document.getElementById("modal-value").textContent      = live.value || "—";
+    document.getElementById("modal-desc").textContent       = live.desc || "";
     const statusEl = document.getElementById("modal-status");
-    statusEl.innerHTML = `<span class="modal-status-badge badge-${t.status||'neutral'}">${t.statusLabel||"Unknown"}</span>`;
-    overlay.classList.add("open");
+    statusEl.innerHTML = `<span class="modal-status-badge badge-${live.status||'neutral'}">${live.statusLabel||"Unknown"}</span>`;
+
+    const editBtn = document.getElementById("modal-edit-btn");
+    if(isAdmin){ editBtn.classList.add("visible"); }
+    else { editBtn.classList.remove("visible"); }
+
+    editBtn.onclick = () => {
+      document.getElementById("modal-overlay").classList.remove("open");
+      openEditModal(idx);
+    };
+
+    document.getElementById("modal-overlay").classList.add("open");
   }
 
-  g.addEventListener("click", () => { if(!didPan) openModal(); });
-
+  g.addEventListener("click", () => { if(!didPan) openViewModal(); });
   g.addEventListener("touchend", e => {
-    if(wasTap){
-      e.preventDefault();
-      e.stopPropagation();
-      openModal();
-    }
+    if(wasTap){ e.preventDefault(); e.stopPropagation(); openViewModal(); }
   },{passive:false});
 });
 
-/* ── MENU PILL TOGGLE ── */
+/* ── REFRESH SVG VISUALS after edit ── */
+function refreshTerritoryVisuals(idx){
+  const {poly, icon} = svgGroups[idx];
+  const t = territories[idx];
+  poly.style.fill = hexToRGBA(t.color, 0.19);
+  icon.setAttribute("href", t.icon);
+}
+
+/* ── EDIT MODAL ── */
+let editingIdx = null;
+
+function openEditModal(idx){
+  editingIdx = idx;
+  const t = territories[idx];
+  document.getElementById("edit-title").textContent = "Edit: " + (t.name || "Territory "+t.id);
+  document.getElementById("edit-name").value        = t.name || "";
+  document.getElementById("edit-controller").value  = t.controller || "Uncontrolled";
+  document.getElementById("edit-status").value      = t.status || "neutral";
+  document.getElementById("edit-status-label").value= t.statusLabel || "Neutral";
+  document.getElementById("edit-size").value        = t.size || "";
+  document.getElementById("edit-value").value       = t.value || "";
+  document.getElementById("edit-desc").value        = t.desc || "";
+  document.getElementById("edit-overlay").classList.add("open");
+}
+
+document.getElementById("edit-save").addEventListener("click", () => {
+  if(editingIdx === null) return;
+  const t = territories[editingIdx];
+  const newController = document.getElementById("edit-controller").value;
+  t.name        = document.getElementById("edit-name").value.trim() || t.name;
+  t.controller  = newController;
+  t.status      = document.getElementById("edit-status").value;
+  t.statusLabel = document.getElementById("edit-status-label").value.trim() || t.statusLabel;
+  t.size        = document.getElementById("edit-size").value.trim() || t.size;
+  t.value       = document.getElementById("edit-value").value.trim() || t.value;
+  t.desc        = document.getElementById("edit-desc").value.trim();
+  t.icon        = factionIcons[newController] || "unc.png";
+  t.color       = factionColors[newController] || "#0a0a0a";
+  saveTerritoryData(t);
+  refreshTerritoryVisuals(editingIdx);
+  renderStats();
+  document.getElementById("edit-overlay").classList.remove("open");
+  showToast();
+  editingIdx = null;
+});
+
+document.getElementById("edit-cancel").onclick = () => {
+  document.getElementById("edit-overlay").classList.remove("open");
+  editingIdx = null;
+};
+document.getElementById("edit-close").onclick = () => {
+  document.getElementById("edit-overlay").classList.remove("open");
+  editingIdx = null;
+};
+document.getElementById("edit-overlay").addEventListener("click", e => {
+  if(e.target === document.getElementById("edit-overlay")){
+    document.getElementById("edit-overlay").classList.remove("open");
+    editingIdx = null;
+  }
+});
+
+/* Auto-fill status label when status changes */
+document.getElementById("edit-status").addEventListener("change", function(){
+  const labels = {neutral:"Neutral", controlled:"Controlled", contested:"Contested"};
+  document.getElementById("edit-status-label").value = labels[this.value] || this.value;
+});
+
+/* ── LOGIN ── */
+function setAdminState(loggedIn){
+  isAdmin = loggedIn;
+  document.getElementById("admin-indicator").classList.toggle("visible", loggedIn);
+  document.getElementById("login-btn").style.display  = loggedIn ? "none" : "flex";
+  document.getElementById("logout-btn").style.display = loggedIn ? "flex" : "none";
+}
+
+document.getElementById("login-btn").addEventListener("click", e => {
+  e.stopPropagation();
+  closeMenu();
+  document.getElementById("login-error").classList.remove("visible");
+  document.getElementById("login-username").value = "";
+  document.getElementById("login-password").value = "";
+  document.getElementById("login-overlay").classList.add("open");
+  setTimeout(() => document.getElementById("login-username").focus(), 100);
+});
+
+document.getElementById("login-close").onclick = () => document.getElementById("login-overlay").classList.remove("open");
+document.getElementById("login-overlay").addEventListener("click", e => {
+  if(e.target === document.getElementById("login-overlay")) document.getElementById("login-overlay").classList.remove("open");
+});
+
+document.getElementById("login-submit").addEventListener("click", tryLogin);
+document.getElementById("login-password").addEventListener("keydown", e => {
+  if(e.key === "Enter") tryLogin();
+});
+document.getElementById("login-username").addEventListener("keydown", e => {
+  if(e.key === "Enter") document.getElementById("login-password").focus();
+});
+
+function tryLogin(){
+  const u = document.getElementById("login-username").value.trim();
+  const p = document.getElementById("login-password").value;
+  if(u === ADMIN_USERNAME && p === ADMIN_PASSWORD){
+    setAdminState(true);
+    document.getElementById("login-overlay").classList.remove("open");
+    document.getElementById("login-error").classList.remove("visible");
+  } else {
+    document.getElementById("login-error").classList.add("visible");
+    document.getElementById("login-password").value = "";
+    document.getElementById("login-password").focus();
+  }
+}
+
+document.getElementById("logout-btn").addEventListener("click", e => {
+  e.stopPropagation();
+  setAdminState(false);
+  closeMenu();
+});
+
+/* ── TOAST ── */
+function showToast(){
+  const t = document.getElementById("save-toast");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+/* ── MENU ── */
 const menuPill     = document.getElementById("menu-pill");
 const menuDropdown = document.getElementById("menu-dropdown");
 const menuCard     = document.getElementById("menu-card");
@@ -1261,8 +1644,7 @@ menuPill.addEventListener("click", e => {
   menuDropdown.classList.contains("open") ? closeMenu() : openMenu();
 });
 menuPill.addEventListener("touchstart", e => {
-  e.stopPropagation();
-  e.preventDefault();
+  e.stopPropagation(); e.preventDefault();
   menuDropdown.classList.contains("open") ? closeMenu() : openMenu();
 },{passive:false});
 
@@ -1270,13 +1652,12 @@ document.addEventListener("click", e => {
   if(!document.getElementById("top-right-hud").contains(e.target)) closeMenu();
 });
 
-/* ── TOGGLE BORDERS ONLY ── */
+/* ── BORDERS TOGGLE ── */
 let bordersOnly = false;
 const toggleBtn = document.getElementById("toggle-nodes-btn");
 
 function doToggle(){
   bordersOnly = !bordersOnly;
-  toggleBtn.querySelector(".menu-icon").textContent = "🗺️";
   toggleBtn.childNodes[toggleBtn.childNodes.length-1].textContent = bordersOnly ? " Show All" : " Borders Only";
   svg.classList.toggle("borders-only", bordersOnly);
   document.querySelectorAll(".territory-poly").forEach(p => {
@@ -1291,7 +1672,7 @@ function doToggle(){
 toggleBtn.addEventListener("click", e => { e.stopPropagation(); doToggle(); });
 toggleBtn.addEventListener("touchstart", e => { e.stopPropagation(); e.preventDefault(); doToggle(); },{passive:false});
 
-/* ── LEADERBOARD BUTTON ── */
+/* ── LEADERBOARD ── */
 const lbOverlay = document.getElementById("leaderboard-overlay");
 const lbBtn     = document.getElementById("leaderboard-btn");
 
@@ -1307,8 +1688,13 @@ lbBtn.addEventListener("touchstart", e => { e.stopPropagation(); e.preventDefaul
 document.getElementById("leaderboard-close").onclick = () => lbOverlay.classList.remove("open");
 lbOverlay.addEventListener("click", e => { if(e.target === lbOverlay) lbOverlay.classList.remove("open"); });
 
-document.getElementById("modal-close").onclick = () => overlay.classList.remove("open");
-overlay.addEventListener("click", e => { if(e.target === overlay) overlay.classList.remove("open"); });
+document.getElementById("modal-close").onclick = () => document.getElementById("modal-overlay").classList.remove("open");
+document.getElementById("modal-overlay").addEventListener("click", e => {
+  if(e.target === document.getElementById("modal-overlay")) document.getElementById("modal-overlay").classList.remove("open");
+});
+
+/* ── INIT STATS ── */
+renderStats();
 </script>
 
 </body>
