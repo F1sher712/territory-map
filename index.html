@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Territory Map</title>
 
 <style>
@@ -13,6 +13,8 @@ body{
   overflow:hidden;
   font-family:"Times New Roman", serif;
   color:white;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
 }
 
 /* ── NO TEXT SELECTION ── */
@@ -378,6 +380,8 @@ body{
   max-width:92vw;
   max-height:88vh;
   overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
   background:#121212;
   border-radius:4px;
   box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
@@ -546,12 +550,15 @@ body{
   position:relative;
   width:340px;
   max-width:90vw;
+  max-height:90vh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
   background:#121212;
   border-radius:8px;
   box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
   animation:slideUp 0.25s ease;
   font-family:"Times New Roman",serif;
-  overflow:hidden;
 }
 
 #login-accent{
@@ -649,13 +656,15 @@ body{
 #edit-box{
   position:relative;
   width:480px;max-width:92vw;
-  max-height:88vh;overflow-y:auto;
+  max-height:88vh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
   background:#121212;
   border-radius:8px;
   box-shadow:0 20px 60px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
   animation:slideUp 0.25s ease;
   font-family:"Times New Roman",serif;
-  overflow:hidden;
 }
 
 #edit-accent{
@@ -789,6 +798,8 @@ body{
   position:relative;
   width:420px;max-width:92vw;max-height:85vh;
   overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
   background:#121212;border-radius:4px;
   box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
   animation:slideUp 0.25s ease;
@@ -903,9 +914,28 @@ body{
   #edit-overlay{ align-items:flex-end; }
   #edit-box{
     width:100%;max-width:100%;
+    max-height:92vh;
     border-radius:16px 16px 0 0;
   }
+  #edit-inner{ padding:20px 16px 32px; }
   .edit-row{ grid-template-columns:1fr; }
+  .edit-field input,
+  .edit-field select,
+  .edit-field textarea{ font-size:16px; padding:11px 12px; }
+  .edit-actions{ position:sticky; bottom:0; background:#121212; padding-top:12px; margin-top:8px; }
+  #login-overlay{ align-items:flex-end; }
+  #login-box{
+    width:100%;max-width:100%;
+    border-radius:16px 16px 0 0;
+  }
+  #login-inner{ padding:24px 16px 32px; }
+  .login-field input{ font-size:16px; padding:11px 12px; }
+  /* iPhone safe area — home indicator */
+  .modal{ padding-bottom:env(safe-area-inset-bottom); }
+  #edit-box{ padding-bottom:env(safe-area-inset-bottom); }
+  #login-box{ padding-bottom:env(safe-area-inset-bottom); }
+  #leaderboard-box{ padding-bottom:env(safe-area-inset-bottom); }
+  #top-right-hud{ right:max(14px, env(safe-area-inset-right)); top:max(10px, env(safe-area-inset-top)); }
 }
 </style>
 </head>
@@ -1054,6 +1084,7 @@ body{
           <option value="Bandits">Bandits</option>
           <option value="Monolith">Monolith</option>
           <option value="Ukranian Military">Ukranian Military</option>
+
         </select>
       </div>
 
@@ -1350,6 +1381,8 @@ let tapStartX=0, tapStartY=0, wasTap=false, lastTouchDist=0;
 const TAP_THRESHOLD = 10;
 
 container.addEventListener("touchstart", e => {
+  const anyModalOpen = document.querySelector("#edit-overlay.open, #login-overlay.open, #modal-overlay.open, #leaderboard-overlay.open");
+  if(anyModalOpen) return;
   e.preventDefault();
   if(e.touches.length === 1){
     dragging=true; wasTap=true;
@@ -1361,6 +1394,8 @@ container.addEventListener("touchstart", e => {
 },{passive:false});
 
 container.addEventListener("touchmove", e => {
+  const anyModalOpen = document.querySelector("#edit-overlay.open, #login-overlay.open, #modal-overlay.open, #leaderboard-overlay.open");
+  if(anyModalOpen) return;
   e.preventDefault();
   if(e.touches.length === 1 && dragging){
     const dx = e.touches[0].clientX - lastX;
