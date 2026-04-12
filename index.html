@@ -1115,6 +1115,9 @@ body{
 <!-- SAVE TOAST -->
 <div id="save-toast">Territory updated successfully.</div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 /* ── ADMIN CREDENTIALS ── */
 /* Change these to whatever you want */
@@ -1125,8 +1128,18 @@ const ADMIN_PASSWORD = "eocnodemappass";
 let isAdmin = false;
 const ADMIN_SESSION_KEY = "territory_admin_session";
 
-/* ── STORAGE KEY PREFIX ── */
-const STORE_PREFIX = "territory_";
+/* ── FIREBASE CONFIG ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyDXi0UFMdpk-kVHT8_onEBCJwt6VNwqe1c",
+  authDomain: "nodemap-eoc.firebaseapp.com",
+  databaseURL: "https://nodemap-eoc-default-rtdb.firebaseio.com",
+  projectId: "nodemap-eoc",
+  storageBucket: "nodemap-eoc.firebasestorage.app",
+  messagingSenderId: "1085331795055",
+  appId: "1:1085331795055:web:f92a34373130130a4cb19a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 /* ── DEFAULT TERRITORY DATA ── */
 const defaultTerritories = [
@@ -1216,24 +1229,11 @@ const factionColors = {
   "Clear Sky":"#4090cc"
 };
 
-/* ── LOAD TERRITORY STATE FROM STORAGE ── */
+/* ── TERRITORY STATE ── */
 let territories = defaultTerritories.map(t => Object.assign({}, t));
-
-function loadSavedData(){
-  territories.forEach((t, i) => {
-    const key = STORE_PREFIX + t.id;
-    try {
-      const raw = localStorage.getItem(key);
-      if(raw){
-        const saved = JSON.parse(raw);
-        territories[i] = Object.assign({}, t, saved);
-      }
-    } catch(e){}
-  });
-}
+let svgReady = false;
 
 function saveTerritoryData(t){
-  const key = STORE_PREFIX + t.id;
   const toSave = {
     name: t.name,
     subtitle: t.subtitle,
@@ -1246,12 +1246,22 @@ function saveTerritoryData(t){
     color: t.color,
     icon: t.icon
   };
-  try {
-    localStorage.setItem(key, JSON.stringify(toSave));
-  } catch(e){}
+  db.ref("territories/" + t.id).set(toSave);
 }
 
-loadSavedData();
+/* ── REAL-TIME LISTENER: fires on load AND whenever any client saves ── */
+db.ref("territories").on("value", snapshot => {
+  const data = snapshot.val();
+  if(!data) return;
+  territories.forEach((t, i) => {
+    const saved = data[t.id];
+    if(saved) territories[i] = Object.assign({}, t, saved);
+  });
+  if(svgReady){
+    territories.forEach((_, i) => refreshTerritoryVisuals(i));
+    renderStats();
+  }
+});
 
 /* ── HELPERS ── */
 function hexToRGBA(hex, alpha){
@@ -1714,6 +1724,9 @@ document.getElementById("modal-close").onclick = () => document.getElementById("
 document.getElementById("modal-overlay").addEventListener("click", e => {
   if(e.target === document.getElementById("modal-overlay")) document.getElementById("modal-overlay").classList.remove("open");
 });
+
+/* ── MARK SVG READY ── */
+svgReady = true;
 
 /* ── INIT STATS ── */
 renderStats();
